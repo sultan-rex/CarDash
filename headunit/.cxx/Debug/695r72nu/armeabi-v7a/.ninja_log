@@ -1,0 +1,7 @@
+# ninja log v5
+0	63	1792908878772173850	CMakeFiles/usbhelper.dir/usbhelper.c.o	58f994770c74823d
+64	138	1792908878845740839	/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/armeabi-v7a/libusbhelper.so	2c8b2b4e462c4f7e
+0	255	1792908878961260152	CMakeFiles/hur_soft_hevc.dir/ffmpeg_hevc_decoder.cpp.o	fefb85dbaf3083db
+256	329	1792908879037256345	/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/armeabi-v7a/libhur_soft_hevc.so	d97baf6e7f6f0cf5
+0	468	1792908879173435191	CMakeFiles/hur_aaudio.dir/aaudio_output.cpp.o	5da88a7882f21b1e
+469	555	1792908879258815864	/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/armeabi-v7a/libhur_aaudio.so	f8dd4da57d6a36f5

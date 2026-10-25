@@ -1,0 +1,41 @@
+{
+  "buildFiles": [
+    "/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/opt/homebrew/share/android-commandlinetools/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/private/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/opt/homebrew/share/android-commandlinetools/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/private/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "usbhelper::@6890427a1f51a3e7e1df": {
+      "artifactName": "usbhelper",
+      "abi": "x86",
+      "output": "/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/x86/libusbhelper.so",
+      "runtimeFiles": [
+        "/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/src/main/jniLibs/x86/libusb1.0.so"
+      ]
+    },
+    "hur_aaudio::@6890427a1f51a3e7e1df": {
+      "artifactName": "hur_aaudio",
+      "abi": "x86",
+      "output": "/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/x86/libhur_aaudio.so",
+      "runtimeFiles": []
+    },
+    "hur_soft_hevc::@6890427a1f51a3e7e1df": {
+      "artifactName": "hur_soft_hevc",
+      "abi": "x86",
+      "output": "/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/build/intermediates/cxx/Debug/695r72nu/obj/x86/libhur_soft_hevc.so",
+      "runtimeFiles": []
+    }
+  }
+}

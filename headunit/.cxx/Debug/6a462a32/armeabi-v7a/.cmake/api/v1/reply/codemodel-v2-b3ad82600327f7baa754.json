@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "headunit",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "hur_aaudio::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-hur_aaudio-Debug-1c5956398aab09f147a6.json",
+					"name" : "hur_aaudio",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "hur_soft_hevc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-hur_soft_hevc-Debug-bb21e7ea1e777976bfd1.json",
+					"name" : "hur_soft_hevc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "usbhelper::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-usbhelper-Debug-566f0d9043b31f5b673c.json",
+					"name" : "usbhelper",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/armeabi-v7a",
+		"source" : "/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/src/main/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

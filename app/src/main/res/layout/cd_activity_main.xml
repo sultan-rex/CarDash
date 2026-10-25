@@ -55,6 +55,34 @@
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
+                <ImageButton
+                    android:id="@+id/btn_autostart"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Start Android Auto when a phone connects"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_car" />
+
+                <ImageButton
+                    android:id="@+id/btn_wifi"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Wi-Fi"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_wifi" />
+
+                <ImageButton
+                    android:id="@+id/btn_bt"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:contentDescription="Bluetooth"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_bluetooth" />
+
                 <ImageView
                     android:id="@+id/obd_dot"
                     android:layout_width="10dp"
@@ -200,11 +228,6 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:orientation="horizontal">
-
-                        <LinearLayout android:id="@+id/tile_music" style="@style/Tile">
-                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_music" />
-                            <TextView style="@style/TileLabel" android:text="Music" />
-                        </LinearLayout>
 
                         <LinearLayout android:id="@+id/tile_gauges" style="@style/Tile">
                             <ImageView style="@style/TileIcon" android:src="@drawable/ic_speed" />
@@ -547,5 +570,6 @@
             android:layout_marginStart="8dp"
             android:alpha="0.3"
             android:src="@drawable/dot" />
+
     </LinearLayout>
 </FrameLayout>

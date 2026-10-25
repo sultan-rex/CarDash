@@ -40,15 +40,15 @@ public class MainActivity extends Activity implements ObdManager.Listener {
             "com.google.android.apps.maps", "app.organicmaps", "net.osmand", "net.osmand.plus", "com.waze"};
     private static final String[] MUSIC_APPS = {
             "com.spotify.music", "com.google.android.apps.youtube.music", "com.google.android.music", "com.android.music"};
-
     private Prefs prefs;
     private TextView statSpeed, statSpeedLabel, statRpm, statCoolant, statVolt, obdStatus;
     private ImageView obdDot, npArt;
     private TextView npTitle, npArtist;
     private ImageButton npPlay;
     private PagerView pager;
-    private View dot0, dot1, dot2;
+    private View[] dots;
     private FuelPage fuel;
+    private ConnectControls connect;
     private SpeedoView speedo;
     private GaugeView gRpm, gCoolant, gThrottle, gLoad, gVolt;
 
@@ -83,15 +83,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
 
         findViewById(R.id.tile_aa).setOnClickListener(v -> openAndroidAuto());
         findViewById(R.id.tile_nav).setOnClickListener(v -> openNavigation());
-        findViewById(R.id.tile_music).setOnClickListener(v -> openMusic());
         pager = findViewById(R.id.pager);
-        dot0 = findViewById(R.id.dot_0);
-        dot1 = findViewById(R.id.dot_1);
-        dot2 = findViewById(R.id.dot_2);
+        dots = new View[]{findViewById(R.id.dot_0), findViewById(R.id.dot_1), findViewById(R.id.dot_2)};
         pager.setOnPageChange(page -> {
-            dot0.setAlpha(page == 0 ? 1f : 0.3f);
-            dot1.setAlpha(page == 1 ? 1f : 0.3f);
-            dot2.setAlpha(page == 2 ? 1f : 0.3f);
+            for (int i = 0; i < dots.length; i++) dots[i].setAlpha(i == page ? 1f : 0.3f);
         });
         speedo = findViewById(R.id.g_speedo);
         gRpm = findViewById(R.id.g_rpm);
@@ -103,6 +98,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         findViewById(R.id.stats).setOnClickListener(v -> pager.goTo(1));
         findViewById(R.id.btn_dtc).setOnClickListener(v -> readCodes());
         fuel = new FuelPage(this, prefs);
+        connect = new ConnectControls(this);
         findViewById(R.id.btn_settings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         findViewById(R.id.now_playing).setOnClickListener(v -> { if (!mediaAccess) openMediaAccessSettings(this); });
 
@@ -128,12 +124,14 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         if (prefs.fahrenheit()) gCoolant.setRange(100, 266, 221, "°F");
         else gCoolant.setRange(40, 130, 105, "°C");
         fuel.refresh();
+        connect.start();
         render();
     }
 
     @Override
     protected void onStop() {
         ObdManager.get().removeListener(this);
+        connect.stop();
         stopGps();
         disconnectMedia();
         super.onStop();
@@ -326,14 +324,25 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         setController(null);
     }
 
+    /**
+     * Prefers whatever is playing, then a session that has a real track title. The idle
+     * "Android Auto, Connected" placeholder from the embedded head unit only wins as a last resort.
+     */
     private void pickController(List<MediaController> list) {
         MediaController pick = null;
+        int best = -1;
         if (list != null) {
             for (MediaController mc : list) {
                 PlaybackState s = mc.getPlaybackState();
-                if (s != null && s.getState() == PlaybackState.STATE_PLAYING) { pick = mc; break; }
+                MediaMetadata md = mc.getMetadata();
+                String title = md == null ? null : md.getString(MediaMetadata.METADATA_KEY_TITLE);
+                boolean placeholder = "Android Auto".equals(title);
+                int score = 0;
+                if (s != null && s.getState() == PlaybackState.STATE_PLAYING) score += 4;
+                if (title != null && !title.isEmpty() && !placeholder) score += 2;
+                if (s != null && s.getState() != PlaybackState.STATE_NONE) score += 1;
+                if (score > best) { best = score; pick = mc; }
             }
-            if (pick == null && !list.isEmpty()) pick = list.get(0);
         }
         setController(pick);
     }
@@ -358,6 +367,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
 
     private void renderMedia() {
         MediaMetadata md = controller == null ? null : controller.getMetadata();
+        // The embedded head unit's idle session reads "Android Auto / Connected"; that is not a track.
+        if (md != null && "Android Auto".equals(md.getString(MediaMetadata.METADATA_KEY_TITLE))) md = null;
         if (!mediaAccess) {
             npTitle.setText("Tap to show music here");
             npArtist.setText("Allow CarDash now-playing access");

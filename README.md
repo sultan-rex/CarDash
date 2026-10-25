@@ -26,7 +26,13 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
    Long-press a fill-up to delete it. Units follow the speed unit setting (km, L, L/100 km, or mi, gal, mpg).
 5. **Navigation:** install an offline maps app (the tablet has no mobile data) and download
    your region's maps at home over Wi-Fi.
-6. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
+6. **Start Android Auto from Bluetooth:** the car icon in the top bar (next to Wi-Fi and Bluetooth) chooses which phones start
+   Android Auto when they connect over Bluetooth: *Off*, *Chosen phones*, or *Any phone*. *Any phone* only matches devices
+   Android classes as a phone, so a speaker or headset does not start it. The same choices are in Settings → Android Auto.
+   Pair a new phone first; for *Chosen phones*, tick it in Settings.
+7. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
+   dim when off). Tap one to pick a saved network or a paired device, or to turn it on or off.
+8. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
 
 ## Android Auto
 

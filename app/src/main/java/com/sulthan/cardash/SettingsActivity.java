@@ -9,9 +9,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.provider.Settings;
+
+import com.andrerinas.openheadunit.host.AutoStart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +51,26 @@ public class SettingsActivity extends Activity {
                 loadPairedDevices();
                 return false;
             });
+            findPreference("aa_any_phone").setOnPreferenceChangeListener((p, value) -> {
+                boolean on = (Boolean) value;
+                AutoStart.setAnyPhone(getActivity(), on);
+                ((android.preference.SwitchPreference) p).setChecked(on);
+                updateSummaries();
+                return false; // saved above, in the head unit's own settings
+            });
+            findPreference("aa_bt_phones").setOnPreferenceChangeListener((p, value) -> {
+                @SuppressWarnings("unchecked")
+                Set<String> macs = new java.util.HashSet<>((Set<String>) value);
+                String first = macs.isEmpty() ? "" : plainName(macs.iterator().next());
+                AutoStart.setDevices(getActivity(), macs, first);
+                if (!macs.isEmpty()) {
+                    getPreferenceManager().getSharedPreferences().edit()
+                            .putStringSet(ConnectControls.SAVED_PHONES, macs).apply();
+                }
+                ((MultiSelectListPreference) p).setValues(macs);
+                updateSummaries();
+                return false; // saved above, in the head unit's own lists
+            });
             loadPairedDevices();
             updateSummaries();
         }
@@ -73,6 +96,13 @@ public class SettingsActivity extends Activity {
             }
         }
 
+        private final java.util.Map<String, String> pairedNames = new java.util.HashMap<>();
+
+        private String plainName(String mac) {
+            String n = pairedNames.get(mac);
+            return n == null ? mac : n;
+        }
+
         private void loadPairedDevices() {
             ListPreference p = (ListPreference) findPreference("obd_device");
             List<String> names = new ArrayList<>();
@@ -82,13 +112,23 @@ public class SettingsActivity extends Activity {
                 Set<BluetoothDevice> bonded = bt == null ? null : bt.getBondedDevices();
                 if (bonded != null) {
                     for (BluetoothDevice d : bonded) {
-                        names.add((d.getName() == null ? "Unknown" : d.getName()) + "  (" + d.getAddress() + ")");
+                        String plain = d.getName() == null ? "Unknown" : d.getName();
+                        pairedNames.put(d.getAddress(), plain);
+                        names.add(plain + "  (" + d.getAddress() + ")");
                         addrs.add(d.getAddress());
                     }
                 }
             } catch (SecurityException ignored) {}
             p.setEntries(names.toArray(new CharSequence[0]));
             p.setEntryValues(addrs.toArray(new CharSequence[0]));
+
+            // Phones that start Android Auto: the same paired devices, current choice from the head unit.
+            MultiSelectListPreference phones = (MultiSelectListPreference) findPreference("aa_bt_phones");
+            phones.setEntries(names.toArray(new CharSequence[0]));
+            phones.setEntryValues(addrs.toArray(new CharSequence[0]));
+            phones.setValues(new java.util.HashSet<>(AutoStart.getMacs(getActivity())));
+            ((android.preference.SwitchPreference) findPreference("aa_any_phone"))
+                    .setChecked(AutoStart.isAnyPhone(getActivity()));
         }
 
         private void updateSummaries() {
@@ -98,6 +138,16 @@ public class SettingsActivity extends Activity {
                     : dev.getEntries() == null || dev.getEntries().length == 0
                     ? "Pair your ELM327 in Android Bluetooth settings first (PIN is usually 1234 or 0000)"
                     : "Choose your ELM327 adapter");
+
+            MultiSelectListPreference phones = (MultiSelectListPreference) findPreference("aa_bt_phones");
+            Set<String> chosen = phones.getValues();
+            if (chosen == null || chosen.isEmpty()) {
+                phones.setSummary("None. Choose the phones that should start Android Auto when they connect over Bluetooth");
+            } else {
+                List<String> label = new ArrayList<>();
+                for (String mac : chosen) label.add(plainName(mac));
+                phones.setSummary(android.text.TextUtils.join(", ", label));
+            }
 
             EditTextPreference ssid = (EditTextPreference) findPreference("aa_ssid");
             String s = ssid.getText();

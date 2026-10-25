@@ -41,6 +41,15 @@
             android:key="aa_ssid"
             android:singleLine="true"
             android:title="Phone hotspot name (SSID)" />
+        <SwitchPreference
+            android:key="aa_any_phone"
+            android:persistent="false"
+            android:summary="Any phone that connects over Bluetooth starts Android Auto"
+            android:title="Any phone" />
+        <MultiSelectListPreference
+            android:key="aa_bt_phones"
+            android:persistent="false"
+            android:title="Phones that start Android Auto (Bluetooth)" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Navigation">

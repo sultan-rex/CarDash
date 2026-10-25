@@ -2,6 +2,7 @@ package com.sulthan.cardash;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,6 +24,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -44,9 +46,15 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageView obdDot, npArt;
     private TextView npTitle, npArtist;
     private ImageButton npPlay;
+    private PagerView pager;
+    private View dot0, dot1, dot2;
+    private FuelPage fuel;
+    private SpeedoView speedo;
+    private GaugeView gRpm, gCoolant, gThrottle, gLoad, gVolt;
 
     private double gpsSpeedKmh = Double.NaN;
     private ObdData lastObd = new ObdData();
+    private boolean obdConnected;
 
     private MediaSessionManager sessions;
     private MediaController controller;
@@ -76,8 +84,25 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         findViewById(R.id.tile_aa).setOnClickListener(v -> openAndroidAuto());
         findViewById(R.id.tile_nav).setOnClickListener(v -> openNavigation());
         findViewById(R.id.tile_music).setOnClickListener(v -> openMusic());
-        findViewById(R.id.tile_gauges).setOnClickListener(v -> startActivity(new Intent(this, GaugesActivity.class)));
-        findViewById(R.id.stats).setOnClickListener(v -> startActivity(new Intent(this, GaugesActivity.class)));
+        pager = findViewById(R.id.pager);
+        dot0 = findViewById(R.id.dot_0);
+        dot1 = findViewById(R.id.dot_1);
+        dot2 = findViewById(R.id.dot_2);
+        pager.setOnPageChange(page -> {
+            dot0.setAlpha(page == 0 ? 1f : 0.3f);
+            dot1.setAlpha(page == 1 ? 1f : 0.3f);
+            dot2.setAlpha(page == 2 ? 1f : 0.3f);
+        });
+        speedo = findViewById(R.id.g_speedo);
+        gRpm = findViewById(R.id.g_rpm);
+        gCoolant = findViewById(R.id.g_coolant);
+        gThrottle = findViewById(R.id.g_throttle);
+        gLoad = findViewById(R.id.g_load);
+        gVolt = findViewById(R.id.g_volt);
+        findViewById(R.id.tile_gauges).setOnClickListener(v -> pager.goTo(1));
+        findViewById(R.id.stats).setOnClickListener(v -> pager.goTo(1));
+        findViewById(R.id.btn_dtc).setOnClickListener(v -> readCodes());
+        fuel = new FuelPage(this, prefs);
         findViewById(R.id.btn_settings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         findViewById(R.id.now_playing).setOnClickListener(v -> { if (!mediaAccess) openMediaAccessSettings(this); });
 
@@ -98,6 +123,11 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         startGps();
         connectMedia();
         statSpeedLabel.setText(prefs.speedUnit());
+        if (prefs.mph()) speedo.setRange(160, 20, "mph");
+        else speedo.setRange(240, 20, "km/h");
+        if (prefs.fahrenheit()) gCoolant.setRange(100, 266, 221, "°F");
+        else gCoolant.setRange(40, 130, 105, "°C");
+        fuel.refresh();
         render();
     }
 
@@ -117,7 +147,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
 
     @Override
     public void onBackPressed() {
-        // As a home screen there is nothing to go back to.
+        // As a home screen the only "back" is from the gauges page to the first page.
+        if (pager.page() != 0) pager.goTo(0);
     }
 
     @Override
@@ -154,7 +185,9 @@ public class MainActivity extends Activity implements ObdManager.Listener {
 
     @Override
     public void onObdState(ObdManager.State state, String message) {
+        obdConnected = state == ObdManager.State.CONNECTED;
         showObdState(obdDot, obdStatus, state, message);
+        render();
     }
 
     static void showObdState(ImageView dot, TextView label, ObdManager.State state, String message) {
@@ -162,7 +195,6 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         int c;
         switch (state) {
             case CONNECTED: c = GaugeView.color(ctx, R.color.ok); break;
-            case DEMO: c = GaugeView.color(ctx, R.color.accent); break;
             case CONNECTING: c = 0xFFFFC857; break;
             default: c = GaugeView.color(ctx, R.color.text_dim);
         }
@@ -171,13 +203,72 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     }
 
     private void render() {
-        // OBD speed is more accurate; fall back to GPS when there's no adapter.
-        double speed = !Double.isNaN(lastObd.speedKmh) ? lastObd.speedKmh : gpsSpeedKmh;
-        statSpeed.setText(fmt(Double.isNaN(speed) ? speed : prefs.speed(speed), 0));
+        // OBD speed is more accurate; use GPS until the adapter is connected (or if it reports none).
+        double speed = obdConnected && !Double.isNaN(lastObd.speedKmh) ? lastObd.speedKmh : gpsSpeedKmh;
+        double shownSpeed = Double.isNaN(speed) ? speed : prefs.speed(speed);
+        statSpeed.setText(fmt(shownSpeed, 0));
+        speedo.setValue(shownSpeed);
+        // The engine readings show "--" until the OBD-II adapter is connected.
+        ObdData d = obdConnected ? lastObd : new ObdData();
+        gRpm.setValue(d.rpm);
+        gCoolant.setValue(Double.isNaN(d.coolantC) ? d.coolantC : prefs.temp(d.coolantC));
+        gThrottle.setValue(d.throttlePct);
+        gLoad.setValue(d.loadPct);
+        gVolt.setValue(d.voltage);
+        if (!obdConnected) {
+            statRpm.setText("--");
+            statCoolant.setText("--");
+            statVolt.setText("--");
+            return;
+        }
         statRpm.setText(fmt(lastObd.rpm, 0));
         statCoolant.setText(Double.isNaN(lastObd.coolantC) ? "--"
                 : fmt(prefs.temp(lastObd.coolantC), 0) + prefs.tempUnit());
         statVolt.setText(Double.isNaN(lastObd.voltage) ? "--" : fmt(lastObd.voltage, 1) + "V");
+    }
+
+    // ---------------------------------------------------------------- fault codes
+
+    private void readCodes() {
+        AlertDialog progress = new AlertDialog.Builder(this)
+                .setTitle("Fault codes")
+                .setMessage("Asking the engine computer…")
+                .show();
+        ObdManager.get().readDtcs((codes, message) -> {
+            progress.dismiss();
+            if (isFinishing()) return;
+            if (codes == null) {
+                new AlertDialog.Builder(this).setTitle("Couldn't read codes").setMessage(message)
+                        .setPositiveButton("OK", null).show();
+                return;
+            }
+            AlertDialog.Builder b = new AlertDialog.Builder(this).setTitle("Fault codes");
+            if (codes.isEmpty()) {
+                b.setMessage("No stored fault codes.").setPositiveButton("OK", null);
+            } else {
+                b.setMessage(TextUtils.join("\n", codes)
+                                + "\n\nLook these codes up for your car model to see what they mean.")
+                        .setPositiveButton("OK", null)
+                        .setNegativeButton("Clear codes", (dlg, w) -> confirmClear());
+            }
+            b.show();
+        });
+    }
+
+    private void confirmClear() {
+        new AlertDialog.Builder(this)
+                .setTitle("Clear fault codes?")
+                .setMessage("This turns off the check-engine light and resets emissions readiness. "
+                        + "Only do it with the engine off and ignition on, after the problem is fixed.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Clear", (dlg, w) -> ObdManager.get().clearDtcs(this::showClearResult))
+                .show();
+    }
+
+    private void showClearResult(List<String> codes, String message) {
+        if (isFinishing()) return;
+        new AlertDialog.Builder(this).setTitle("Fault codes").setMessage(message)
+                .setPositiveButton("OK", null).show();
     }
 
     static String fmt(double v, int decimals) {

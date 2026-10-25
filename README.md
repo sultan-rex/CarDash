@@ -17,12 +17,16 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
 
 1. **Home screen:** Settings (sliders icon) → *Set as home app* → choose CarDash, "Always".
 2. **Now playing:** Settings → *Allow now-playing access* → tick CarDash.
-3. **Gauges:** buy a Bluetooth ELM327 OBD-II adapter, plug it into the car's OBD port
+3. **Gauges:** swipe left on the home screen (or tap *Gauges*) for the analog speedometer and engine gauges.
+   Buy a Bluetooth ELM327 OBD-II adapter, plug it into the car's OBD port
    (usually under the steering wheel), pair it in Android Bluetooth settings (PIN 1234 or 0000),
-   then in CarDash settings turn on *Use OBD-II adapter*, pick it, and turn *Demo mode* off.
-4. **Navigation:** install an offline maps app (the tablet has no mobile data) and download
+   then in CarDash settings turn on *Use OBD-II adapter* and pick it. Until the adapter connects, the RPM, coolant and battery tiles show `--` and speed comes from GPS.
+4. **Fuel:** swipe to the third page and tap *Add fill-up* each time you refuel (odometer, fuel added, total cost,
+   and whether you filled to full). Consumption is worked out full-to-full, so partial fills are counted correctly.
+   Long-press a fill-up to delete it. Units follow the speed unit setting (km, L, L/100 km, or mi, gal, mpg).
+5. **Navigation:** install an offline maps app (the tablet has no mobile data) and download
    your region's maps at home over Wi-Fi.
-5. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
+6. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
 
 ## Android Auto
 

@@ -35,7 +35,7 @@ public class ObdService extends Service {
             return START_NOT_STICKY;
         }
         startInForeground();
-        ObdManager.get().start(prefs.obdDevice(), prefs.demoMode());
+        ObdManager.get().start(prefs.obdDevice());
         return START_STICKY;
     }
 

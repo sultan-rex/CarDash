@@ -1,214 +1,551 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Top bar: clock, connection status, settings -->
-    <LinearLayout
+    <com.sulthan.cardash.PagerView
+        android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:layout_height="match_parent">
 
-        <TextClock
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:format12Hour="h:mm"
-            android:format24Hour="HH:mm"
-            android:textColor="@color/text"
-            android:textSize="48sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <TextClock
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:format12Hour="EEE, d MMM"
-            android:format24Hour="EEE, d MMM"
-            android:textColor="@color/text_dim"
-            android:textSize="20sp" />
+        <LinearLayout
+            android:id="@+id/page_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"
+            android:paddingEnd="32dp"
+            android:paddingStart="32dp"
+            android:paddingTop="20dp">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            <!-- Top bar: clock, connection status, settings -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:textColor="@color/text"
+                    android:textSize="64sp" />
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="EEEE, d MMMM"
+                    android:format24Hour="EEEE, d MMMM"
+                    android:textColor="@color/text_dim"
+                    android:textSize="18sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/obd_dot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@drawable/dot" />
+
+                <TextView
+                    android:id="@+id/obd_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="sans-serif-light"
+                    android:textColor="@color/text_dim"
+                    android:textSize="14sp" />
+
+                <ImageButton
+                    android:id="@+id/btn_settings"
+                    style="@style/IconButton"
+                    android:contentDescription="Settings"
+                    android:src="@drawable/ic_tune"
+                    android:tint="@color/text_dim" />
+            </LinearLayout>
+
+            <!-- Middle: now playing + launcher tiles -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/now_playing"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="24dp"
+                    android:layout_weight="5"
+                    android:background="@drawable/round_ripple"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/np_art"
+                        android:layout_width="128dp"
+                        android:layout_height="128dp"
+                        android:background="@drawable/art_bg"
+                        android:clipToOutline="true"
+                        android:padding="0dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_music"
+                        android:tint="@color/track" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/np_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-light"
+                            android:maxLines="2"
+                            android:text="Nothing playing"
+                            android:textColor="@color/text"
+                            android:textSize="26sp" />
+
+                        <TextView
+                            android:id="@+id/np_artist"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
+                            android:textColor="@color/text_dim"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="-14dp"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageButton
+                                android:id="@+id/np_prev"
+                                style="@style/IconButton"
+                                android:contentDescription="Previous"
+                                android:src="@drawable/ic_prev" />
+
+                            <ImageButton
+                                android:id="@+id/np_play"
+                                style="@style/IconButton"
+                                android:layout_width="68dp"
+                                android:layout_height="68dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginStart="4dp"
+                                android:contentDescription="Play or pause"
+                                android:padding="12dp"
+                                android:src="@drawable/cd_ic_play"
+                                android:tint="@color/accent" />
+
+                            <ImageButton
+                                android:id="@+id/np_next"
+                                style="@style/IconButton"
+                                android:contentDescription="Next"
+                                android:src="@drawable/ic_next" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <LinearLayout android:id="@+id/tile_aa" style="@style/Tile">
+                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_car" />
+                            <TextView style="@style/TileLabel" android:text="Android Auto" />
+                        </LinearLayout>
+
+                        <LinearLayout android:id="@+id/tile_nav" style="@style/Tile">
+                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_nav" />
+                            <TextView style="@style/TileLabel" android:text="Navigation" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <LinearLayout android:id="@+id/tile_music" style="@style/Tile">
+                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_music" />
+                            <TextView style="@style/TileLabel" android:text="Music" />
+                        </LinearLayout>
+
+                        <LinearLayout android:id="@+id/tile_gauges" style="@style/Tile">
+                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_speed" />
+                            <TextView style="@style/TileLabel" android:text="Gauges" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Bottom strip: quick readouts -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/line" />
+
+            <LinearLayout
+                android:id="@+id/stats"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:background="@drawable/round_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="horizontal">
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/stat_speed" style="@style/StatValue" android:text="--" />
+                    <TextView android:id="@+id/stat_speed_label" style="@style/StatLabel" android:text="km/h" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/stat_rpm" style="@style/StatValue" android:text="--" />
+                    <TextView style="@style/StatLabel" android:text="RPM" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/stat_coolant" style="@style/StatValue" android:text="--" />
+                    <TextView style="@style/StatLabel" android:text="Coolant" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/stat_volt" style="@style/StatValue" android:text="--" />
+                    <TextView style="@style/StatLabel" android:text="Battery" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/page_gauges"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingBottom="28dp"
+            android:paddingEnd="32dp"
+            android:paddingStart="32dp"
+            android:paddingTop="20dp">
+
+            <com.sulthan.cardash.SpeedoView
+                android:id="@+id/g_speedo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="5" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="6"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <com.sulthan.cardash.GaugeView
+                        android:id="@+id/g_rpm"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:decimals="0"
+                        app:maxValue="8000"
+                        app:minValue="0"
+                        app:title="RPM"
+                        app:unit="rpm"
+                        app:warnValue="6000" />
+
+                    <com.sulthan.cardash.GaugeView
+                        android:id="@+id/g_coolant"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:decimals="0"
+                        app:maxValue="130"
+                        app:minValue="40"
+                        app:title="Coolant"
+                        app:unit="°C"
+                        app:warnValue="105" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <com.sulthan.cardash.GaugeView
+                        android:id="@+id/g_throttle"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:decimals="0"
+                        app:maxValue="100"
+                        app:minValue="0"
+                        app:title="Throttle"
+                        app:unit="%" />
+
+                    <com.sulthan.cardash.GaugeView
+                        android:id="@+id/g_load"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:decimals="0"
+                        app:maxValue="100"
+                        app:minValue="0"
+                        app:title="Engine load"
+                        app:unit="%" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <com.sulthan.cardash.GaugeView
+                        android:id="@+id/g_volt"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:decimals="1"
+                        app:maxValue="16"
+                        app:minValue="10"
+                        app:title="Battery"
+                        app:unit="V"
+                        app:warnValue="15" />
+
+                    <LinearLayout
+                        android:id="@+id/btn_dtc"
+                        style="@style/Tile"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginTop="24dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_warning_red" />
+
+                        <TextView style="@style/TileLabel" android:text="Fault codes" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/page_fuel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingBottom="28dp"
+            android:paddingEnd="32dp"
+            android:paddingStart="32dp"
+            android:paddingTop="20dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="32dp"
+                android:layout_weight="5"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Fuel"
+                    android:textColor="@color/text_dim"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/fuel_avg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="--"
+                    android:textColor="@color/text"
+                    android:textSize="88sp" />
+
+                <TextView
+                    android:id="@+id/fuel_avg_unit"
+                    style="@style/StatLabel"
+                    android:layout_marginBottom="32dp"
+                    android:text="L/100 km average" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_last" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="Last fill-up" />
+                    </LinearLayout>
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_best" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="Best" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_cost_km" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="Cost per distance" />
+                    </LinearLayout>
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_range" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="Distance per fill" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_month" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="This month" />
+                    </LinearLayout>
+                    <LinearLayout style="@style/FuelCell">
+                        <TextView android:id="@+id/fuel_total" style="@style/FuelValue" />
+                        <TextView style="@style/StatLabel" android:text="Total spent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="6"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-light"
+                        android:text="Fill-ups"
+                        android:textColor="@color/text"
+                        android:textSize="26sp" />
+
+                    <TextView
+                        android:id="@+id/btn_fuel_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:background="@drawable/tile_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:paddingEnd="24dp"
+                        android:paddingStart="24dp"
+                        android:text="+  Add fill-up"
+                        android:textColor="@color/accent"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ListView
+                        android:id="@+id/fuel_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:divider="@color/line"
+                        android:dividerHeight="1dp"
+                        android:scrollbars="none" />
+
+                    <TextView
+                        android:id="@+id/fuel_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:text="No fill-ups yet.\nTap Add fill-up after you refuel."
+                        android:textColor="@color/text_dim"
+                        android:textSize="16sp" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+        </LinearLayout>
+    </com.sulthan.cardash.PagerView>
+
+    <!-- Page dots -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/obd_dot"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
+            android:id="@+id/dot_0"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
             android:src="@drawable/dot" />
 
-        <TextView
-            android:id="@+id/obd_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/dot_1"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            android:textColor="@color/text_dim"
-            android:textSize="16sp" />
+            android:alpha="0.3"
+            android:src="@drawable/dot" />
 
-        <ImageButton
-            android:id="@+id/btn_settings"
-            style="@style/IconButton"
-            android:contentDescription="Settings"
-            android:src="@drawable/ic_tune" />
+        <ImageView
+            android:id="@+id/dot_2"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_marginStart="8dp"
+            android:alpha="0.3"
+            android:src="@drawable/dot" />
     </LinearLayout>
-
-    <!-- Middle: now playing + launcher tiles -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/now_playing"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="4"
-            android:background="@drawable/card_bg"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:id="@+id/np_art"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_music"
-                android:tint="@color/track" />
-
-            <TextView
-                android:id="@+id/np_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:text="Nothing playing"
-                android:textColor="@color/text"
-                android:textSize="22sp" />
-
-            <TextView
-                android:id="@+id/np_artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:textColor="@color/text_dim"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/np_prev"
-                    style="@style/IconButton"
-                    android:contentDescription="Previous"
-                    android:src="@drawable/ic_prev" />
-
-                <ImageButton
-                    android:id="@+id/np_play"
-                    style="@style/IconButton"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Play or pause"
-                    android:src="@drawable/cd_ic_play"
-                    android:tint="@color/accent" />
-
-                <ImageButton
-                    android:id="@+id/np_next"
-                    style="@style/IconButton"
-                    android:contentDescription="Next"
-                    android:src="@drawable/ic_next" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="6"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <LinearLayout android:id="@+id/tile_aa" style="@style/Tile">
-                    <ImageView style="@style/TileIcon" android:src="@drawable/ic_car" />
-                    <TextView style="@style/TileLabel" android:text="Android Auto" />
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/tile_nav" style="@style/Tile">
-                    <ImageView style="@style/TileIcon" android:src="@drawable/ic_nav" />
-                    <TextView style="@style/TileLabel" android:text="Navigation" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <LinearLayout android:id="@+id/tile_music" style="@style/Tile">
-                    <ImageView style="@style/TileIcon" android:src="@drawable/ic_music" />
-                    <TextView style="@style/TileLabel" android:text="Music" />
-                </LinearLayout>
-
-                <LinearLayout android:id="@+id/tile_gauges" style="@style/Tile">
-                    <ImageView style="@style/TileIcon" android:src="@drawable/ic_speed" />
-                    <TextView style="@style/TileLabel" android:text="Gauges" />
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Bottom strip: quick readouts -->
-    <LinearLayout
-        android:id="@+id/stats"
-        android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/tile_bg"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="horizontal">
-
-        <LinearLayout style="@style/StatBox">
-            <TextView android:id="@+id/stat_speed" style="@style/StatValue" android:text="--" />
-            <TextView android:id="@+id/stat_speed_label" style="@style/StatLabel" android:text="km/h" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/StatBox">
-            <TextView android:id="@+id/stat_rpm" style="@style/StatValue" android:text="--" />
-            <TextView style="@style/StatLabel" android:text="RPM" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/StatBox">
-            <TextView android:id="@+id/stat_coolant" style="@style/StatValue" android:text="--" />
-            <TextView style="@style/StatLabel" android:text="Coolant" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/StatBox">
-            <TextView android:id="@+id/stat_volt" style="@style/StatValue" android:text="--" />
-            <TextView style="@style/StatLabel" android:text="Battery" />
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+</FrameLayout>

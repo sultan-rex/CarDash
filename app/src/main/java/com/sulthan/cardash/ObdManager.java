@@ -30,7 +30,7 @@ public final class ObdManager {
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final long RETRY_DELAY_MS = 5000;
 
-    public enum State { DISCONNECTED, CONNECTING, CONNECTED, DEMO }
+    public enum State { DISCONNECTED, CONNECTING, CONNECTED }
 
     public interface Listener {
         void onObdData(ObdData data);
@@ -70,13 +70,10 @@ public final class ObdManager {
 
     public void removeListener(Listener l) { listeners.remove(l); }
 
-    public synchronized void start(String address, boolean demo) {
+    public synchronized void start(String address) {
         stop();
         running = true;
-        Thread t = new Thread(() -> {
-            if (demo) runDemo();
-            else runAdapter(address);
-        }, "obd");
+        Thread t = new Thread(() -> runAdapter(address), "obd");
         worker = t;
         t.start();
     }
@@ -98,39 +95,11 @@ public final class ObdManager {
     public void clearDtcs(DtcCallback cb) { enqueue(new Job(true, cb)); }
 
     private void enqueue(Job job) {
-        if (state != State.CONNECTED && state != State.DEMO) {
+        if (state != State.CONNECTED) {
             main.post(() -> job.cb.onResult(null, "Adapter not connected"));
             return;
         }
         jobs.add(job);
-    }
-
-    // ---------------------------------------------------------------- demo
-
-    private void runDemo() {
-        setState(State.DEMO, "Demo data");
-        long t0 = SystemClock.elapsedRealtime();
-        while (alive()) {
-            double t = (SystemClock.elapsedRealtime() - t0) / 1000.0;
-            synchronized (this) {
-                data.speedKmh = Math.max(0, 60 + 45 * Math.sin(t / 6));
-                data.rpm = 900 + data.speedKmh * 28 + 300 * Math.sin(t * 1.3);
-                data.coolantC = Math.min(92, 40 + t * 2);
-                data.throttlePct = Math.max(0, 25 + 20 * Math.sin(t / 2));
-                data.loadPct = Math.max(0, 35 + 15 * Math.sin(t / 3));
-                data.intakeC = 32;
-                data.voltage = 13.9 + 0.2 * Math.sin(t);
-            }
-            publish();
-            Job job;
-            while ((job = jobs.poll()) != null) {
-                Job j = job;
-                List<String> codes = new ArrayList<>();
-                if (!j.clear) codes.add("P0171");
-                main.post(() -> j.cb.onResult(codes, j.clear ? "Codes cleared (demo)" : "Demo code"));
-            }
-            if (!sleep(200)) return;
-        }
     }
 
     // ------------------------------------------------------------- adapter

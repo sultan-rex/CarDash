@@ -11,7 +11,7 @@ import android.view.View;
 
 import java.util.Locale;
 
-/** A 240° arc gauge with a smoothly animated needle arc and a big digital readout. */
+/** A thin 240° arc gauge with a smoothly animated arc and a large light digital readout. */
 public class GaugeView extends View {
     private static final float START = 150f;
     private static final float SWEEP = 240f;
@@ -27,7 +27,6 @@ public class GaugeView extends View {
 
     private final Paint track = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint arc = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint tick = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint valueText = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint labelText = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval = new RectF();
@@ -54,10 +53,9 @@ public class GaugeView extends View {
         track.setColor(color(ctx, R.color.track));
         arc.setStyle(Paint.Style.STROKE);
         arc.setStrokeCap(Paint.Cap.ROUND);
-        tick.setColor(dim);
         valueText.setColor(color(ctx, R.color.text));
         valueText.setTextAlign(Paint.Align.CENTER);
-        valueText.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+        valueText.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
         labelText.setColor(dim);
         labelText.setTextAlign(Paint.Align.CENTER);
     }
@@ -87,7 +85,7 @@ public class GaugeView extends View {
         float w = getWidth(), h = getHeight();
         // The arc's open bottom ends at 0.5r below centre; the title sits just under that.
         float size = Math.min(w - 16, (h - 16) / 0.85f);
-        float stroke = size * 0.07f;
+        float stroke = size * 0.03f;
         float r = size / 2 - stroke;
         float contentH = stroke / 2 + r * 1.5f + size * 0.15f;
         float cx = w / 2, cy = (h - contentH) / 2 + stroke / 2 + r;
@@ -96,15 +94,6 @@ public class GaugeView extends View {
         track.setStrokeWidth(stroke);
         arc.setStrokeWidth(stroke);
         c.drawArc(oval, START, SWEEP, false, track);
-
-        // Ticks
-        tick.setStrokeWidth(Math.max(2, stroke * 0.12f));
-        for (int i = 0; i < majorTicks; i++) {
-            double ang = Math.toRadians(START + SWEEP * i / (majorTicks - 1));
-            float r1 = r - stroke * 0.9f, r2 = r - stroke * 1.5f;
-            c.drawLine(cx + (float) Math.cos(ang) * r1, cy + (float) Math.sin(ang) * r1,
-                    cx + (float) Math.cos(ang) * r2, cy + (float) Math.sin(ang) * r2, tick);
-        }
 
         // Ease toward the target value for smooth motion between OBD samples.
         if (!Float.isNaN(target) && !Float.isNaN(shown) && Math.abs(target - shown) > (max - min) * 0.002f) {
@@ -123,7 +112,7 @@ public class GaugeView extends View {
             text = String.format(Locale.US, "%." + decimals + "f", shown);
         }
 
-        valueText.setTextSize(size * 0.22f);
+        valueText.setTextSize(size * 0.24f);
         c.drawText(text, cx, cy + size * 0.07f, valueText);
         labelText.setTextSize(size * 0.08f);
         c.drawText(unit, cx, cy + size * 0.2f, labelText);

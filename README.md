@@ -41,7 +41,10 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
    It shows a home icon on the Android Auto screen and a car icon elsewhere; tap it to fade between Android Auto and CarDash.
    Both stay running, so switching does not restart the session. Press and drag it to move it; it docks in the nearest corner.
    Turn it off in Settings → Android Auto → *Switch button*.
-8. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
+8. **Start with the car:** power the tablet from a USB port that switches on with the ignition. When charging starts, CarDash
+   wakes the screen and opens (Settings → Startup → *Start with the car*; a simple swipe lock screen is dismissed, a PIN is not).
+   Leave the tablet asleep rather than switched off: an app cannot power on a tablet that is fully off, and this tablet has no
+   setting to boot when a charger is connected.
 
 ## Android Auto
 

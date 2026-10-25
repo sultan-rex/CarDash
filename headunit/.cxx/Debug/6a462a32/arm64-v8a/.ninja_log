@@ -1,7 +1,0 @@
-# ninja log v5
-1	106	1792910188706316629	CMakeFiles/usbhelper.dir/usbhelper.c.o	7943d6a0c74b3e88
-106	189	1792910188788476637	/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/build/intermediates/cxx/Debug/6a462a32/obj/arm64-v8a/libusbhelper.so	761a4a0e560c0e36
-1	388	1792910188986122776	CMakeFiles/hur_soft_hevc.dir/ffmpeg_hevc_decoder.cpp.o	4da3a273ded394b6
-389	476	1792910189070645438	/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/build/intermediates/cxx/Debug/6a462a32/obj/arm64-v8a/libhur_soft_hevc.so	b5f619895b3dc3e4
-0	579	1792910189175307913	CMakeFiles/hur_aaudio.dir/aaudio_output.cpp.o	652a101753cf2a90
-579	682	1792910189276464782	/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/build/intermediates/cxx/Debug/6a462a32/obj/arm64-v8a/libhur_aaudio.so	652d1236c3bf6d3f

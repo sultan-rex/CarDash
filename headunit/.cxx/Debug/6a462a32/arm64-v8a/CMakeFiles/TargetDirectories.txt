@@ -1,5 +1,0 @@
-/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/arm64-v8a/CMakeFiles/hur_aaudio.dir
-/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/arm64-v8a/CMakeFiles/usbhelper.dir
-/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/arm64-v8a/CMakeFiles/hur_soft_hevc.dir
-/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/sulthan/AndroidStudioProjects/CarDash-merged/headunit/.cxx/Debug/6a462a32/arm64-v8a/CMakeFiles/rebuild_cache.dir

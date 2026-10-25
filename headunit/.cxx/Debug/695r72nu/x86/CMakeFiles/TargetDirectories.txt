@@ -1,5 +1,0 @@
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86/CMakeFiles/hur_aaudio.dir
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86/CMakeFiles/usbhelper.dir
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86/CMakeFiles/hur_soft_hevc.dir
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86/CMakeFiles/edit_cache.dir
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/.cxx/Debug/695r72nu/x86/CMakeFiles/rebuild_cache.dir

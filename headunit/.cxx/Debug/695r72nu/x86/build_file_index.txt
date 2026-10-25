@@ -1,1 +1,0 @@
-/tmp/claude-504/-Users-sulthan-Movies/da85a2a1-277e-4f8a-b41c-a38153798850/scratchpad/oss/open-headunit/app/src/main/cpp/CMakeLists.txt

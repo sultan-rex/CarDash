@@ -19,7 +19,6 @@ import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,8 +35,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements ObdManager.Listener {
-    private static final String[] NAV_APPS = {
-            "com.google.android.apps.maps", "app.organicmaps", "net.osmand", "net.osmand.plus", "com.waze"};
     private static final String[] MUSIC_APPS = {
             "com.spotify.music", "com.google.android.apps.youtube.music", "com.google.android.music", "com.android.music"};
     private Prefs prefs;
@@ -47,6 +44,17 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageButton npPlay;
     private PagerView pager;
     private View[] dots;
+    private View aaTile;
+    private ImageView aaIcon;
+    private TextView aaStatus;
+    private Boolean aaShown; // what the tile currently shows; null until first drawn
+    private final android.os.Handler ui = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable aaPoll = new Runnable() {
+        @Override public void run() {
+            updateAaTile();
+            ui.postDelayed(this, 1500);
+        }
+    };
     private FuelPage fuel;
     private ConnectControls connect;
     private SpeedoView speedo;
@@ -81,8 +89,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         npArtist = findViewById(R.id.np_artist);
         npPlay = findViewById(R.id.np_play);
 
-        findViewById(R.id.tile_aa).setOnClickListener(v -> openAndroidAuto());
-        findViewById(R.id.tile_nav).setOnClickListener(v -> openNavigation());
+        aaTile = findViewById(R.id.tile_aa);
+        aaIcon = findViewById(R.id.tile_aa_icon);
+        aaStatus = findViewById(R.id.tile_aa_status);
+        aaTile.setOnClickListener(v -> openAndroidAuto());
         pager = findViewById(R.id.pager);
         dots = new View[]{findViewById(R.id.dot_0), findViewById(R.id.dot_1), findViewById(R.id.dot_2)};
         pager.setOnPageChange(page -> {
@@ -115,6 +125,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     protected void onStart() {
         super.onStart();
         ObdService.sync(this);
+        SwitchOverlayService.sync(this);
         ObdManager.get().addListener(this);
         startGps();
         connectMedia();
@@ -125,6 +136,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         else gCoolant.setRange(40, 130, 105, "°C");
         fuel.refresh();
         connect.start();
+        ui.post(aaPoll);
         render();
     }
 
@@ -132,6 +144,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     protected void onStop() {
         ObdManager.get().removeListener(this);
         connect.stop();
+        ui.removeCallbacks(aaPoll);
         stopGps();
         disconnectMedia();
         super.onStop();
@@ -410,28 +423,19 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         return true;
     }
 
-    private void openPlayStore(String pkg) {
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg)));
-        } catch (ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
-        }
+    /** Outlines the Android Auto tile in teal while a phone is connected. */
+    private void updateAaTile() {
+        boolean on = com.andrerinas.openheadunit.host.HostBridge.isConnected(this);
+        if (aaShown != null && aaShown == on) return;
+        aaShown = on;
+        aaTile.setBackgroundResource(on ? R.drawable.tile_bg_active : R.drawable.tile_bg);
+        aaIcon.setImageTintList(android.content.res.ColorStateList.valueOf(
+                GaugeView.color(this, on ? R.color.accent : R.color.text)));
+        aaStatus.setVisibility(on ? View.VISIBLE : View.GONE);
     }
 
     private void openAndroidAuto() {
         startActivity(new Intent(this, com.andrerinas.openheadunit.main.MainActivity.class));
-    }
-
-    private void openNavigation() {
-        String pref = prefs.navApp();
-        if (!"auto".equals(pref)) {
-            if (!launchPackage(pref)) openPlayStore(pref);
-            return;
-        }
-        for (String pkg : NAV_APPS) if (launchPackage(pkg)) return;
-        Toast.makeText(this, "No navigation app found. An offline maps app works best without mobile data.",
-                Toast.LENGTH_LONG).show();
-        openPlayStore("app.organicmaps");
     }
 
     private void openMusic() {

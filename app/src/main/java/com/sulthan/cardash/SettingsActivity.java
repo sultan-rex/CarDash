@@ -90,6 +90,7 @@ public class SettingsActivity extends Activity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
             updateSummaries();
+            if ("overlay_switch".equals(key)) SwitchOverlayService.sync(getActivity());
             if ("obd_enabled".equals(key) || "obd_device".equals(key)) {
                 // Re-delivering the start command reconnects with the new settings.
                 ObdService.sync(getActivity());

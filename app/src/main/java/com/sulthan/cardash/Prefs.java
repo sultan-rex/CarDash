@@ -18,7 +18,6 @@ public final class Prefs {
     public boolean fahrenheit() { return "f".equals(sp.getString("temp_unit", "c")); }
     public boolean aaAutoLaunch() { return sp.getBoolean("aa_autolaunch", false); }
     public String aaSsid() { return sp.getString("aa_ssid", "").trim(); }
-    public String navApp() { return sp.getString("nav_app", "auto"); }
     public boolean launchOnPower() { return sp.getBoolean("launch_on_power", true); }
 
     /** True when the OBD service should be running (an adapter is enabled and chosen). */

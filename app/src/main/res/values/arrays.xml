@@ -16,18 +16,4 @@
         <item>c</item>
         <item>f</item>
     </string-array>
-    <string-array name="nav_apps">
-        <item>Automatic (first installed)</item>
-        <item>Google Maps</item>
-        <item>Organic Maps (offline)</item>
-        <item>OsmAnd (offline)</item>
-        <item>Waze</item>
-    </string-array>
-    <string-array name="nav_app_values">
-        <item>auto</item>
-        <item>com.google.android.apps.maps</item>
-        <item>app.organicmaps</item>
-        <item>net.osmand</item>
-        <item>com.waze</item>
-    </string-array>
 </resources>

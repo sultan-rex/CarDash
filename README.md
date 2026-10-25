@@ -1,7 +1,13 @@
 # CarDash
 
 A car dashboard for an old Android tablet (built for the Lenovo Tab 3 TB3-710I, Android 5.1).
-Music, navigation, OBD-II gauges, and Android Auto built in as a single app.
+OBD-II gauges, a fuel log, and Android Auto built in as a single app.
+
+The home screen has three pages you swipe between:
+
+1. **Home:** clock, now playing, the Android Auto and Gauges tiles, and a row of engine readouts.
+2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, plus the fault-code reader.
+3. **Fuel:** a fill-up log with consumption and cost statistics.
 
 ## Build and install
 
@@ -20,28 +26,46 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
 3. **Gauges:** swipe left on the home screen (or tap *Gauges*) for the analog speedometer and engine gauges.
    Buy a Bluetooth ELM327 OBD-II adapter, plug it into the car's OBD port
    (usually under the steering wheel), pair it in Android Bluetooth settings (PIN 1234 or 0000),
-   then in CarDash settings turn on *Use OBD-II adapter* and pick it. Until the adapter connects, the RPM, coolant and battery tiles show `--` and speed comes from GPS.
+   then in CarDash settings turn on *Use OBD-II adapter* and pick it. Until the adapter connects, the RPM,
+   coolant and battery readouts show `--` and speed comes from GPS.
 4. **Fuel:** swipe to the third page and tap *Add fill-up* each time you refuel (odometer, fuel added, total cost,
    and whether you filled to full). Consumption is worked out full-to-full, so partial fills are counted correctly.
    Long-press a fill-up to delete it. Units follow the speed unit setting (km, L, L/100 km, or mi, gal, mpg).
-5. **Navigation:** install an offline maps app (the tablet has no mobile data) and download
-   your region's maps at home over Wi-Fi.
-6. **Start Android Auto from Bluetooth:** the car icon in the top bar (next to Wi-Fi and Bluetooth) chooses which phones start
+5. **Start Android Auto from Bluetooth:** the car icon in the top bar (next to Wi-Fi and Bluetooth) chooses which phones start
    Android Auto when they connect over Bluetooth: *Off*, *Chosen phones*, or *Any phone*. *Any phone* only matches devices
    Android classes as a phone, so a speaker or headset does not start it. The same choices are in Settings → Android Auto.
    Pair a new phone first; for *Chosen phones*, tick it in Settings.
-7. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
+6. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
    dim when off). Tap one to pick a saved network or a paired device, or to turn it on or off.
+7. **Switch button:** while a phone is connected, a quarter-circle tab sits in a corner of the screen above everything else.
+   It shows a home icon on the Android Auto screen and a car icon elsewhere; tap it to fade between Android Auto and CarDash.
+   Both stay running, so switching does not restart the session. Press and drag it to move it; it docks in the nearest corner.
+   Turn it off in Settings → Android Auto → *Switch button*.
 8. **Start with the car:** power the tablet from a USB port that switches on with the ignition.
 
 ## Android Auto
 
-Android Auto is built in. The **Android Auto** tile opens the embedded head unit
-([Open Headunit](https://github.com/andreknieriem/open-headunit)); no separate app is needed.
-The first time it opens, it runs a short setup wizard.
+Android Auto is built in; no separate app is needed
+([Open Headunit](https://github.com/andreknieriem/open-headunit) provides the head unit). The **Android Auto** tile is
+outlined in teal with a "Connected" line while a phone is connected. Tapping it opens the head unit, where you connect a
+phone (USB or wireless), change its settings, or get back to the projection. The first time, it runs a short setup wizard.
 
-The tablet only has 2.4 GHz Wi-Fi, so Android's official wireless Android Auto (which needs 5 GHz)
-won't work. Open Headunit's Wi-Fi mode does work over the phone's hotspot:
+### Wireless, started by Bluetooth
+
+When a chosen (or any) phone connects over Bluetooth, the tablet starts Android Auto's wireless mode:
+
+1. Bluetooth connects; the tablet recognises the phone from the auto-start list.
+2. The tablet creates a private Wi-Fi Direct network and listens for the phone.
+3. It wakes the phone over Bluetooth; the two swap the network's name and password over Bluetooth.
+4. The phone joins that network, and video, audio and touch run over Wi-Fi.
+
+So Bluetooth and Wi-Fi both need to be on, on the tablet and on the phone, and the phone needs wireless Android Auto
+enabled. The tablet is on its own Wi-Fi Direct network for this, so it will not be on another Wi-Fi network at the same time.
+
+### Over the phone's hotspot
+
+The tablet only has 2.4 GHz Wi-Fi. If wireless mode does not work with a phone, Open Headunit's Wi-Fi mode also works over
+the phone's hotspot:
 
 1. On the phone, turn on the **mobile hotspot**, and set it to 2.4 GHz if it has the option.
 2. On the phone, enable Android Auto developer mode (Android Auto settings → tap *Version* 10 times),
@@ -50,7 +74,19 @@ won't work. Open Headunit's Wi-Fi mode does work over the phone's hotspot:
 4. In CarDash settings turn on *Auto-start wireless Android Auto* and enter the hotspot name.
    From then on, CarDash opens Android Auto automatically whenever the tablet joins that hotspot.
 
-USB also works: plug the phone into the tablet with an OTG adapter and pick USB mode.
+### USB
+
+Plug the phone into the tablet with an OTG adapter. This needs no Bluetooth or Wi-Fi, and starts automatically when a
+phone is plugged in.
+
+### Music on the home screen
+
+The *Now playing* card shows what is playing: your phone's track, artist and artwork while Android Auto is connected
+(Open Headunit mirrors them into a media session on the tablet), or an app running on the tablet. Previous, play/pause
+and next control whichever it is.
+
+Over Bluetooth alone, a phone's music and track details cannot reach this tablet: its Bluetooth stack ships with the
+receiving roles switched off. Android Auto is the way to get them.
 
 ## Project layout
 
@@ -58,10 +94,22 @@ USB also works: plug the phone into the tablet with an OTG adapter and pick USB 
 - `headunit/` – Open Headunit, converted to an Android library (Kotlin and native code).
 - `contract/` – Open Headunit's shared intent contract library.
 
-Changes made to the upstream Open Headunit code: it builds as a library, its launcher icon,
-home-screen alias and navigation-app intent filters are removed, and its native build is limited to
-`armeabi-v7a` and `arm64-v8a`. CarDash's own `AppTheme`, `activity_main` and `ic_play` resources are
-prefixed `cd_`/`Cd` so they do not override Open Headunit's.
+Notable pieces in `app/`: `MainActivity` (home, pager, Android Auto tile), `PagerView` (swipe pages), `SpeedoView` and
+`GaugeView` (gauges), `FuelLog` and `FuelPage` (fuel), `ConnectControls` (Wi-Fi, Bluetooth and auto-start buttons),
+`SwitchOverlayService` and `SwitchButtonView` (the switch button), and `ObdManager` (ELM327 over Bluetooth).
+
+Changes made to the upstream Open Headunit code:
+
+- It builds as a library: no launcher icon, home-screen alias or navigation-app intent filters, native build limited to
+  `armeabi-v7a` and `arm64-v8a`, and the upstream "github" flavor sources merged into `main`.
+- The Android Auto screen runs in its own task (`taskAffinity` ending `.projection`), so it can be switched to and from
+  CarDash without being destroyed.
+- *Any phone* Bluetooth auto-start in `AutoStartReceiver` and `Settings`, and the `host/` helpers (`AutoStart`, `HostBridge`)
+  that CarDash uses to choose phones, read the connection state and bring the projection forward.
+- The phone's now-playing is mirrored into the media session by default.
+
+CarDash's own `AppTheme`, `activity_main` and `ic_play` resources are prefixed `cd_`/`Cd` so they do not override Open
+Headunit's.
 
 ## Licence
 

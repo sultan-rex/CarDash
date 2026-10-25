@@ -213,14 +213,17 @@
                         android:orientation="horizontal">
 
                         <LinearLayout android:id="@+id/tile_aa" style="@style/Tile">
-                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_car" />
+                            <ImageView android:id="@+id/tile_aa_icon" style="@style/TileIcon" android:src="@drawable/ic_car" />
                             <TextView style="@style/TileLabel" android:text="Android Auto" />
+                            <TextView
+                                android:id="@+id/tile_aa_status"
+                                style="@style/StatLabel"
+                                android:layout_marginTop="4dp"
+                                android:text="Connected"
+                                android:textColor="@color/accent"
+                                android:visibility="gone" />
                         </LinearLayout>
 
-                        <LinearLayout android:id="@+id/tile_nav" style="@style/Tile">
-                            <ImageView style="@style/TileIcon" android:src="@drawable/ic_nav" />
-                            <TextView style="@style/TileLabel" android:text="Navigation" />
-                        </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout

@@ -42,6 +42,11 @@
             android:singleLine="true"
             android:title="Phone hotspot name (SSID)" />
         <SwitchPreference
+            android:defaultValue="true"
+            android:key="overlay_switch"
+            android:summary="A floating button to flip between Android Auto and CarDash while a phone is connected. Drag it to move it."
+            android:title="Switch button" />
+        <SwitchPreference
             android:key="aa_any_phone"
             android:persistent="false"
             android:summary="Any phone that connects over Bluetooth starts Android Auto"
@@ -52,15 +57,6 @@
             android:title="Phones that start Android Auto (Bluetooth)" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Navigation">
-        <ListPreference
-            android:defaultValue="auto"
-            android:entries="@array/nav_apps"
-            android:entryValues="@array/nav_app_values"
-            android:key="nav_app"
-            android:summary="%s"
-            android:title="Navigation app" />
-    </PreferenceCategory>
 
     <PreferenceCategory android:title="Startup">
         <SwitchPreference

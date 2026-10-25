@@ -32,8 +32,11 @@ final class DriveLog {
         double avgKmh() { return movingSec > 0 ? km / (movingSec / 3600.0) : 0; }
     }
 
-    /** Below this the car counts as stopped, which also hides GPS noise at a standstill. */
-    static final double MOVING_KMH = 3.0;
+    /**
+     * Below this the car counts as stopped. GPS speed wobbles by 3-4 km/h while standing still, so
+     * anything lower would record phantom drives.
+     */
+    static final double MOVING_KMH = 5.0;
     /** Faster than this is a bad reading, not a speed. */
     static final double MAX_KMH = 300.0;
     /** A gap longer than this between samples is not driven distance (the app was not running). */

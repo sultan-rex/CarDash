@@ -25,7 +25,7 @@ public class TripService extends Service implements LocationListener {
     /** A GPS speed older than this is treated as lost. */
     private static final long GPS_FRESH_MS = 3000;
     /** Worse than this many metres, a GPS speed is not trusted. */
-    private static final float GPS_MAX_ACCURACY_M = 50f;
+    private static final float GPS_MAX_ACCURACY_M = 25f;
 
     private final Handler ui = new Handler(Looper.getMainLooper());
     private DriveLog log;

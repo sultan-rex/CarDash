@@ -25,6 +25,8 @@ public final class Prefs {
         return obdEnabled() && obdDevice() != null;
     }
 
+    public double dist(double km) { return mph() ? km * 0.621371 : km; }
+    public String distUnit() { return mph() ? "mi" : "km"; }
     public double speed(double kmh) { return mph() ? kmh * 0.621371 : kmh; }
     public String speedUnit() { return mph() ? "mph" : "km/h"; }
     public double temp(double c) { return fahrenheit() ? c * 9 / 5 + 32 : c; }

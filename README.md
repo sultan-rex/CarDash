@@ -6,7 +6,8 @@ OBD-II gauges, a fuel log, and Android Auto built in as a single app.
 The home screen has three pages you swipe between:
 
 1. **Home:** clock, now playing, the Android Auto and Gauges tiles, and a row of engine readouts.
-2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, plus the fault-code reader.
+2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, the fault-code reader, and a strip
+   with today's top speed, this month's top speed, today's distance and a **Drives** calendar.
 3. **Fuel:** a fill-up log with consumption and cost statistics.
 
 ## Build and install
@@ -28,20 +29,25 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
    (usually under the steering wheel), pair it in Android Bluetooth settings (PIN 1234 or 0000),
    then in CarDash settings turn on *Use OBD-II adapter* and pick it. Until the adapter connects, the RPM,
    coolant and battery readouts show `--` and speed comes from GPS.
-4. **Fuel:** swipe to the third page and tap *Add fill-up* each time you refuel (odometer, fuel added, total cost,
+4. **Drives:** the app records each day's distance, top speed and time moving in the background (also while Android Auto is on
+   screen). Speed comes from the OBD-II adapter when it is connected, otherwise from GPS, so turn on **Location** (GPS) in the
+   tablet's settings if you have no adapter. Tap **Drives** on the Gauges page for a month calendar: each driven day shows its
+   kilometres, and tapping a day shows distance, top speed, time moving and average speed, with totals for the month.
+   Distances use the speed unit setting (km or miles). Turn recording off, or clear the history, in Settings -> Drives.
+5. **Fuel:** swipe to the third page and tap *Add fill-up* each time you refuel (odometer, fuel added, total cost,
    and whether you filled to full). Consumption is worked out full-to-full, so partial fills are counted correctly.
    Long-press a fill-up to delete it. Units follow the speed unit setting (km, L, L/100 km, or mi, gal, mpg).
-5. **Start Android Auto from Bluetooth:** the car icon in the top bar (next to Wi-Fi and Bluetooth) chooses which phones start
+6. **Start Android Auto from Bluetooth:** the car icon in the top bar (next to Wi-Fi and Bluetooth) chooses which phones start
    Android Auto when they connect over Bluetooth: *Off*, *Chosen phones*, or *Any phone*. *Any phone* only matches devices
    Android classes as a phone, so a speaker or headset does not start it. The same choices are in Settings → Android Auto.
    Pair a new phone first; for *Chosen phones*, tick it in Settings.
-6. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
+7. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
    dim when off). Tap one to pick a saved network or a paired device, or to turn it on or off.
-7. **Switch button:** while a phone is connected, a quarter-circle tab sits in a corner of the screen above everything else.
+8. **Switch button:** while a phone is connected, a quarter-circle tab sits in a corner of the screen above everything else.
    It shows a home icon on the Android Auto screen and a car icon elsewhere; tap it to fade between Android Auto and CarDash.
    Both stay running, so switching does not restart the session. Press and drag it to move it; it docks in the nearest corner.
    Turn it off in Settings → Android Auto → *Switch button*.
-8. **Start with the car:** power the tablet from a USB port that switches on with the ignition. When charging starts, CarDash
+9. **Start with the car:** power the tablet from a USB port that switches on with the ignition. When charging starts, CarDash
    wakes the screen and opens (Settings → Startup → *Start with the car*; a simple swipe lock screen is dismissed, a PIN is not).
    Leave the tablet asleep rather than switched off: an app cannot power on a tablet that is fully off, and this tablet has no
    setting to boot when a charger is connected.
@@ -99,7 +105,8 @@ receiving roles switched off. Android Auto is the way to get them.
 
 Notable pieces in `app/`: `MainActivity` (home, pager, Android Auto tile), `PagerView` (swipe pages), `SpeedoView` and
 `GaugeView` (gauges), `FuelLog` and `FuelPage` (fuel), `ConnectControls` (Wi-Fi, Bluetooth and auto-start buttons),
-`SwitchOverlayService` and `SwitchButtonView` (the switch button), and `ObdManager` (ELM327 over Bluetooth).
+`SwitchOverlayService` and `SwitchButtonView` (the switch button), `TripService`, `DriveLog`, `DrivesActivity` and
+`CalendarGridView` (drive recording and the calendar), and `ObdManager` (ELM327 over Bluetooth).
 
 Changes made to the upstream Open Headunit code:
 

@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageButton npPlay;
     private PagerView pager;
     private View[] dots;
+    private TextView sTopDay, sTopMonth, sKmDay, sKmDayLabel;
     private View aaTile;
     private ImageView aaIcon;
     private TextView aaStatus;
@@ -52,6 +53,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private final Runnable aaPoll = new Runnable() {
         @Override public void run() {
             updateAaTile();
+            updateDriveStats();
             ui.postDelayed(this, 1500);
         }
     };
@@ -93,6 +95,11 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         npArtist = findViewById(R.id.np_artist);
         npPlay = findViewById(R.id.np_play);
 
+        sTopDay = findViewById(R.id.s_top_day);
+        sTopMonth = findViewById(R.id.s_top_month);
+        sKmDay = findViewById(R.id.s_km_day);
+        sKmDayLabel = findViewById(R.id.s_km_day_label);
+        findViewById(R.id.btn_drives).setOnClickListener(v -> startActivity(new Intent(this, DrivesActivity.class)));
         aaTile = findViewById(R.id.tile_aa);
         aaIcon = findViewById(R.id.tile_aa_icon);
         aaStatus = findViewById(R.id.tile_aa_status);
@@ -130,6 +137,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         super.onStart();
         ObdService.sync(this);
         SwitchOverlayService.sync(this);
+        TripService.sync(this);
         ObdManager.get().addListener(this);
         startGps();
         connectMedia();
@@ -425,6 +433,20 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         if (i == null) return false;
         startActivity(i);
         return true;
+    }
+
+    /** Today's and this month's top speed, and today's distance, from the drive recorder. */
+    private void updateDriveStats() {
+        DriveLog log = DriveLog.get(this);
+        java.util.Calendar now = java.util.Calendar.getInstance();
+        DriveLog.Day today = log.today(now.getTimeInMillis());
+        double topDay = today == null ? 0 : today.topKmh;
+        double topMonth = log.monthTop(now.get(java.util.Calendar.YEAR), now.get(java.util.Calendar.MONTH));
+        double kmDay = today == null ? 0 : today.km;
+        sTopDay.setText(topDay > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topDay), prefs.speedUnit()) : "--");
+        sTopMonth.setText(topMonth > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topMonth), prefs.speedUnit()) : "--");
+        sKmDay.setText(String.format(java.util.Locale.getDefault(), "%.1f %s", prefs.dist(kmDay), prefs.distUnit()));
+        sKmDayLabel.setText("Driven today");
     }
 
     /** Outlines the Android Auto tile in teal while a phone is connected. */

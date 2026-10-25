@@ -283,11 +283,17 @@
             android:id="@+id/page_gauges"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingBottom="28dp"
             android:paddingEnd="32dp"
             android:paddingStart="32dp"
             android:paddingTop="20dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
 
             <com.sulthan.cardash.SpeedoView
                 android:id="@+id/g_speedo"
@@ -393,6 +399,49 @@
 
                         <TextView style="@style/TileLabel" android:text="Fault codes" />
                     </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="2dp"
+                android:background="@color/line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="horizontal">
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/s_top_day" style="@style/FuelValue" />
+                    <TextView style="@style/StatLabel" android:text="Top speed today" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/s_top_month" style="@style/FuelValue" />
+                    <TextView style="@style/StatLabel" android:text="Top speed this month" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/StatBox">
+                    <TextView android:id="@+id/s_km_day" style="@style/FuelValue" />
+                    <TextView android:id="@+id/s_km_day_label" style="@style/StatLabel" android:text="Driven today" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_drives"
+                    style="@style/StatBox"
+                    android:background="@drawable/tile_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <TextView
+                        style="@style/FuelValue"
+                        android:text="Drives  ›"
+                        android:textColor="@color/accent" />
+                    <TextView style="@style/StatLabel" android:text="Calendar" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -56,6 +56,16 @@
             android:theme="@style/SettingsTheme" />
 
         <service
+            android:name=".TripService"
+            android:exported="false" />
+
+        <activity
+            android:name=".DrivesActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/CdAppTheme" />
+
+        <service
             android:name=".SwitchOverlayService"
             android:exported="false" />
 

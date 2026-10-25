@@ -51,6 +51,15 @@ public class SettingsActivity extends Activity {
                 loadPairedDevices();
                 return false;
             });
+            findPreference("clear_drives").setOnPreferenceClickListener(p -> {
+                new android.app.AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert)
+                        .setTitle("Clear drive history?")
+                        .setMessage("Every recorded day, distance and top speed will be deleted.")
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("Clear", (d, w) -> DriveLog.get(getActivity()).clear())
+                        .show();
+                return true;
+            });
             findPreference("aa_any_phone").setOnPreferenceChangeListener((p, value) -> {
                 boolean on = (Boolean) value;
                 AutoStart.setAnyPhone(getActivity(), on);
@@ -91,6 +100,7 @@ public class SettingsActivity extends Activity {
         public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
             updateSummaries();
             if ("overlay_switch".equals(key)) SwitchOverlayService.sync(getActivity());
+            if ("trip_tracking".equals(key)) TripService.sync(getActivity());
             if ("obd_enabled".equals(key) || "obd_device".equals(key)) {
                 // Re-delivering the start command reconnects with the new settings.
                 ObdService.sync(getActivity());

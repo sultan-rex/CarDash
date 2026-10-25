@@ -58,6 +58,18 @@
     </PreferenceCategory>
 
 
+    <PreferenceCategory android:title="Drives">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="trip_tracking"
+            android:summary="Record distance and top speed each day, from the OBD-II adapter or GPS (turn on Location for GPS)"
+            android:title="Record drives" />
+        <Preference
+            android:key="clear_drives"
+            android:summary="Delete every recorded day"
+            android:title="Clear drive history" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Startup">
         <SwitchPreference
             android:defaultValue="true"

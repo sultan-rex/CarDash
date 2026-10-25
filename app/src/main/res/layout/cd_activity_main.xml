@@ -56,6 +56,15 @@
                     android:layout_weight="1" />
 
                 <ImageButton
+                    android:id="@+id/btn_location"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Location"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_location" />
+
+                <ImageButton
                     android:id="@+id/btn_autostart"
                     style="@style/IconButton"
                     android:layout_width="48dp"
@@ -115,11 +124,17 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/now_playing"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="24dp"
                     android:layout_weight="5"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/now_playing"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:background="@drawable/round_ripple"
                     android:clickable="true"
                     android:gravity="center_vertical"
@@ -199,6 +214,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -236,6 +252,63 @@
                             <ImageView style="@style/TileIcon" android:src="@drawable/ic_speed" />
                             <TextView style="@style/TileLabel" android:text="Gauges" />
                         </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Brightness and volume, down the right edge -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="12dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.sulthan.cardash.VerticalSliderView
+                            android:id="@+id/sl_brightness"
+                            android:layout_width="48dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:contentDescription="Brightness" />
+
+                        <ImageButton
+                            android:id="@+id/btn_dim"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/round_ripple"
+                            android:contentDescription="Lowest brightness"
+                            android:padding="13dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_brightness"
+                            android:tint="@color/text_dim" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.sulthan.cardash.VerticalSliderView
+                            android:id="@+id/sl_volume"
+                            android:layout_width="48dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:contentDescription="Volume" />
+
+                        <ImageButton
+                            android:id="@+id/btn_mute"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/round_ripple"
+                            android:contentDescription="Mute"
+                            android:padding="13dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_volume"
+                            android:tint="@color/text_dim" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

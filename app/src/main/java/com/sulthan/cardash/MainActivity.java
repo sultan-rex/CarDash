@@ -44,6 +44,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageButton npPlay;
     private PagerView pager;
     private View[] dots;
+    private VerticalSliderView slVolume, slBrightness;
+    private ImageButton btnMute, btnDim;
+    private android.media.AudioManager audio;
+    private boolean slidersBusy; // a finger is on a slider, so do not fight it with a refresh
     private TextView sTopDay, sTopMonth, sKmDay, sKmDayLabel;
     private View aaTile;
     private ImageView aaIcon;
@@ -54,6 +58,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         @Override public void run() {
             updateAaTile();
             updateDriveStats();
+            syncSliders();
             ui.postDelayed(this, 1500);
         }
     };
@@ -75,9 +80,9 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // A car dashboard: stay lit, and show over a simple (no PIN) lock screen when it wakes.
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+        // A car dashboard: show over a simple (no PIN) lock screen when it wakes. Staying lit is only
+        // while charging (see applyKeepAwake); on battery the screen times out as usual.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         setContentView(R.layout.cd_activity_main);
@@ -100,6 +105,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         sKmDay = findViewById(R.id.s_km_day);
         sKmDayLabel = findViewById(R.id.s_km_day_label);
         findViewById(R.id.btn_drives).setOnClickListener(v -> startActivity(new Intent(this, DrivesActivity.class)));
+        setupSliders();
         aaTile = findViewById(R.id.tile_aa);
         aaIcon = findViewById(R.id.tile_aa_icon);
         aaStatus = findViewById(R.id.tile_aa_status);
@@ -132,11 +138,169 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         requestRuntimePermissions();
     }
 
+    private final BroadcastReceiver plugReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context ctx, Intent intent) { applyKeepAwake(); }
+    };
+
+    /** Keeps the screen on while the charger is connected; on battery it sleeps after the timeout. */
+    private final BroadcastReceiver volumeReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context ctx, Intent intent) { syncSliders(); }
+    };
+
+    /** Lowest brightness the slider can set, so the screen can never be turned fully black. */
+    /**
+     * The brightness slider's lower part (0 to DIM_ZONE percent) is the software dimmer, with the backlight held at
+     * its minimum; above it the real backlight rises from its minimum to its maximum.
+     */
+    private static final int DIM_ZONE = 30;
+    /** The backlight range Android allows on this tablet (10 to 237); filled in from the system when possible. */
+    private int sysMin = 10, sysMax = 255;
+
+    @SuppressWarnings("JavaReflectionMemberAccess")
+    private void readBrightnessRange() {
+        try {
+            android.os.PowerManager pm = (android.os.PowerManager) getSystemService(POWER_SERVICE);
+            int min = (Integer) android.os.PowerManager.class.getMethod("getMinimumScreenBrightnessSetting").invoke(pm);
+            int max = (Integer) android.os.PowerManager.class.getMethod("getMaximumScreenBrightnessSetting").invoke(pm);
+            if (min >= 0 && max > min) { sysMin = min; sysMax = max; }
+        } catch (Exception ignored) { /* keep the defaults */ }
+    }
+
+    /** Slider position 0-100 from what the screen is doing now. */
+    private int brightnessPercent() {
+        int dark = DimService.darkness(this);
+        if (dark > 0) return Math.round(DIM_ZONE * (1f - dark / (float) DimService.MAX_DARKNESS));
+        int b = currentBrightness();
+        int p = DIM_ZONE + (b - sysMin) * (100 - DIM_ZONE) / Math.max(1, sysMax - sysMin);
+        return Math.max(DIM_ZONE, Math.min(100, p));
+    }
+
+    private void setBrightnessPercent(int p) {
+        if (p < DIM_ZONE) {
+            setBacklight(sysMin);
+            DimService.setDarkness(this, Math.round(DimService.MAX_DARKNESS * (1f - p / (float) DIM_ZONE)));
+        } else {
+            DimService.setDarkness(this, 0);
+            setBacklight(sysMin + (p - DIM_ZONE) * (sysMax - sysMin) / (100 - DIM_ZONE));
+        }
+    }
+
+    private void setupSliders() {
+        readBrightnessRange();
+        audio = (android.media.AudioManager) getSystemService(AUDIO_SERVICE);
+        slVolume = findViewById(R.id.sl_volume);
+        slBrightness = findViewById(R.id.sl_brightness);
+        slVolume.setMax(audio.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC));
+        slBrightness.setMax(100);
+        btnMute = findViewById(R.id.btn_mute);
+        btnDim = findViewById(R.id.btn_dim);
+        btnMute.setOnClickListener(v -> toggleMute());
+        btnDim.setOnClickListener(v -> toggleDim());
+        slVolume.setOnTouchState(touching -> slidersBusy = touching);
+        slBrightness.setOnTouchState(touching -> slidersBusy = touching);
+        slVolume.setOnChange((p, fromUser) -> {
+            if (fromUser) audio.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, p, 0);
+        });
+        slBrightness.setOnChange((p, fromUser) -> {
+            if (fromUser) setBrightnessPercent(p);
+        });
+    }
+
+    private static final String PREV_VOLUME = "prev_volume", PREV_BRIGHTNESS = "prev_brightness_pct";
+
+    private int currentBrightness() {
+        return android.provider.Settings.System.getInt(getContentResolver(),
+                android.provider.Settings.System.SCREEN_BRIGHTNESS, 128);
+    }
+
+    /** Mutes by dropping the media volume to zero, remembering the level; tapping again brings it back. */
+    private void toggleMute() {
+        int stream = android.media.AudioManager.STREAM_MUSIC;
+        int now = audio.getStreamVolume(stream);
+        android.content.SharedPreferences sp = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        if (now == 0) {
+            int back = sp.getInt(PREV_VOLUME, 0);
+            if (back <= 0) back = Math.max(1, audio.getStreamMaxVolume(stream) / 2);
+            audio.setStreamVolume(stream, back, 0);
+        } else {
+            sp.edit().putInt(PREV_VOLUME, now).apply();
+            audio.setStreamVolume(stream, 0, 0);
+        }
+        slidersBusy = false;
+        syncSliders();
+    }
+
+    /** Goes to the darkest level, remembering where the slider was; tapping again brings it back. */
+    private void toggleDim() {
+        int now = brightnessPercent();
+        android.content.SharedPreferences sp = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        if (now <= 0) {
+            int back = sp.getInt(PREV_BRIGHTNESS, 0);
+            setBrightnessPercent(back > 0 ? back : 60);
+        } else {
+            sp.edit().putInt(PREV_BRIGHTNESS, now).apply();
+            setBrightnessPercent(0);
+        }
+        slidersBusy = false;
+        syncSliders();
+    }
+
+    /** Teal icons while muted or dimmed, so it is clear why the sound or screen is off. */
+    private void updateSliderButtons(boolean muted, boolean dimmed) {
+        int accent = GaugeView.color(this, R.color.accent), dim = GaugeView.color(this, R.color.text_dim);
+        btnMute.setImageResource(muted ? R.drawable.ic_volume_off : R.drawable.ic_volume);
+        btnMute.setImageTintList(android.content.res.ColorStateList.valueOf(muted ? accent : dim));
+        btnDim.setImageTintList(android.content.res.ColorStateList.valueOf(dimmed ? accent : dim));
+    }
+
+    /** Shows the current volume and brightness, unless a finger is on a slider. */
+    private void syncSliders() {
+        if (slidersBusy || slVolume == null) return;
+        int vol = audio.getStreamVolume(android.media.AudioManager.STREAM_MUSIC);
+        slVolume.setProgress(vol);
+        int bp = brightnessPercent();
+        slBrightness.setProgress(bp);
+        updateSliderButtons(vol == 0, bp <= 0);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setBacklight(int value) {
+        boolean canWrite = android.os.Build.VERSION.SDK_INT < 23 || android.provider.Settings.System.canWrite(this);
+        if (canWrite) {
+            try {
+                android.provider.Settings.System.putInt(getContentResolver(),
+                        android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE,
+                        android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                android.provider.Settings.System.putInt(getContentResolver(),
+                        android.provider.Settings.System.SCREEN_BRIGHTNESS, value);
+                return;
+            } catch (SecurityException ignored) { }
+        }
+        // Without permission to change the system setting, dim only this screen.
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.screenBrightness = value / 255f;
+        getWindow().setAttributes(lp);
+    }
+
+    private void applyKeepAwake() {
+        Intent battery = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        boolean plugged = battery != null && battery.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0) != 0;
+        if (plugged) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter plug = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
+        plug.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        registerReceiver(plugReceiver, plug);
+        applyKeepAwake();
+        registerReceiver(volumeReceiver, new IntentFilter("android.media.VOLUME_CHANGED_ACTION"));
+        syncSliders();
         ObdService.sync(this);
         SwitchOverlayService.sync(this);
+        DimService.sync(this);
         TripService.sync(this);
         ObdManager.get().addListener(this);
         startGps();
@@ -156,6 +320,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     protected void onStop() {
         ObdManager.get().removeListener(this);
         connect.stop();
+        try { unregisterReceiver(plugReceiver); } catch (IllegalArgumentException ignored) { }
+        try { unregisterReceiver(volumeReceiver); } catch (IllegalArgumentException ignored) { }
         ui.removeCallbacks(aaPoll);
         stopGps();
         disconnectMedia();

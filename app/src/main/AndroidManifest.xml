@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Lets the Location button switch location on and off directly. It cannot be granted by the user in
+         Settings: it is given once over adb (see the README); without it the button opens the Location screen. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -54,6 +57,10 @@
             android:exported="false"
             android:label="CarDash settings"
             android:theme="@style/SettingsTheme" />
+
+        <service
+            android:name=".DimService"
+            android:exported="false" />
 
         <service
             android:name=".TripService"

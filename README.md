@@ -5,7 +5,7 @@ OBD-II gauges, a fuel log, and Android Auto built in as a single app.
 
 The home screen has three pages you swipe between:
 
-1. **Home:** clock, now playing, the Android Auto and Gauges tiles, and a row of engine readouts.
+1. **Home:** clock, now playing, the Android Auto and Gauges tiles, vertical brightness and volume sliders down the right edge, and a row of engine readouts.
 2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, the fault-code reader, and a strip
    with today's top speed, this month's top speed, today's distance and a **Drives** calendar.
 3. **Fuel:** a fill-up log with consumption and cost statistics.
@@ -24,6 +24,12 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
 
 1. **Home screen:** Settings (sliders icon) → *Set as home app* → choose CarDash, "Always".
 2. **Now playing:** Settings → *Allow now-playing access* → tick CarDash.
+   The two vertical sliders on the right edge of the home screen set the screen brightness (left) and the media volume
+   (right); drag up for more. Android will not set this tablet's backlight below 10, so the bottom 30% of the brightness
+   slider is a software dimmer instead: a see-through black layer (up to 85%) over the whole screen while the backlight stays
+   at its minimum. It is remembered across restarts and never turns the screen fully black.
+   The buttons under the sliders: the speaker button mutes (tap again to bring the volume back), and the sun button drops
+   the screen to the darkest dimmer level (tap again to bring the previous brightness back). They glow teal while active.
 3. **Gauges:** swipe left on the home screen (or tap *Gauges*) for the analog speedometer and engine gauges.
    Buy a Bluetooth ELM327 OBD-II adapter, plug it into the car's OBD port
    (usually under the steering wheel), pair it in Android Bluetooth settings (PIN 1234 or 0000),
@@ -43,6 +49,11 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
    Pair a new phone first; for *Chosen phones*, tick it in Settings.
 7. **Wi-Fi and Bluetooth:** the two icons beside the OBD status in the top bar show their state (teal when connected,
    dim when off). Tap one to pick a saved network or a paired device, or to turn it on or off.
+   The pin icon is **Location (GPS)**: teal when on, dim when off. Tap it to switch GPS on or off (drive recording and the
+   speed readout use it). Android only lets an app do this with a permission that cannot be granted in Settings, so give it
+   once over adb after installing: `adb shell pm grant com.sulthan.cardash android.permission.WRITE_SECURE_SETTINGS`.
+   Without it the button opens the system Location screen instead. The grant survives app updates but not an uninstall or
+   a factory reset.
 8. **Switch button:** while a phone is connected, a quarter-circle tab sits in a corner of the screen above everything else.
    It shows a home icon on the Android Auto screen and a car icon elsewhere; tap it to fade between Android Auto and CarDash.
    Both stay running, so switching does not restart the session. Press and drag it to move it; it docks in the nearest corner.
@@ -51,6 +62,8 @@ Set `sdk.dir` in `local.properties` if Android Studio has not already.
    wakes the screen and opens (Settings → Startup → *Start with the car*; a simple swipe lock screen is dismissed, a PIN is not).
    Leave the tablet asleep rather than switched off: an app cannot power on a tablet that is fully off, and this tablet has no
    setting to boot when a charger is connected.
+   Screen: it stays on while charging (CarDash keeps it lit only when plugged in, and Android's *Stay awake while charging*
+   is on), and on battery it sleeps after the system screen timeout (1 minute here, Settings -> Display -> Sleep).
 
 ## Android Auto
 

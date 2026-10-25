@@ -38,7 +38,7 @@ final class ConnectControls {
     /** The phones last chosen by hand, kept so "Chosen phones" can be switched back on. */
     static final String SAVED_PHONES = "aa_saved_macs";
 
-    private final ImageView wifiIcon, btIcon, autoIcon;
+    private final ImageView wifiIcon, btIcon, autoIcon, locIcon;
     private final SharedPreferences prefs;
     private final WifiManager wifi;
     private final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
@@ -54,6 +54,8 @@ final class ConnectControls {
         wifiIcon = act.findViewById(R.id.btn_wifi);
         btIcon = act.findViewById(R.id.btn_bt);
         autoIcon = act.findViewById(R.id.btn_autostart);
+        locIcon = act.findViewById(R.id.btn_location);
+        locIcon.setOnClickListener(v -> toggleLocation());
         prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(act);
         autoIcon.setOnClickListener(v -> showAutoStart());
         on = GaugeView.color(act, R.color.text);
@@ -68,6 +70,7 @@ final class ConnectControls {
         IntentFilter f = new IntentFilter();
         f.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         f.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        f.addAction(android.location.LocationManager.PROVIDERS_CHANGED_ACTION);
         f.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         f.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
         f.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
@@ -88,7 +91,37 @@ final class ConnectControls {
         return AutoStart.getMacs(act).isEmpty() ? 0 : 1;
     }
 
+    // ---------------------------------------------------------------- Location
+
+    private boolean locationOn() {
+        android.location.LocationManager lm = (android.location.LocationManager) act.getSystemService(Context.LOCATION_SERVICE);
+        try {
+            return lm != null && lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Switches GPS location on or off (only GPS: the network provider makes Google ask about location sharing). That needs the WRITE_SECURE_SETTINGS permission, which can only be given
+     * over adb; without it the button opens the system Location screen instead.
+     */
+    @SuppressWarnings("deprecation")
+    private void toggleLocation() {
+        boolean turnOn = !locationOn();
+        try {
+            android.content.ContentResolver cr = act.getContentResolver();
+            Settings.Secure.setLocationProviderEnabled(cr, android.location.LocationManager.GPS_PROVIDER, turnOn);
+            Toast.makeText(act, turnOn ? "Location on" : "Location off", Toast.LENGTH_SHORT).show();
+        } catch (SecurityException e) {
+            Toast.makeText(act, turnOn ? "Turn Location on" : "Turn Location off", Toast.LENGTH_SHORT).show();
+            openSettings(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        }
+        refresh();
+    }
+
     void refresh() {
+        tint(locIcon, locationOn() ? connected : off);
         int mode = autoMode();
         tint(autoIcon, mode == 2 ? connected : mode == 1 ? on : off);
         boolean wifiOn = wifi != null && wifi.isWifiEnabled();

@@ -18,8 +18,9 @@ class AutoStartReceiver : BroadcastReceiver() {
         val action = intent.action
         // Use device-protected storage so the BT MACs are readable during locked boot
         val targetMacs = Settings.getAutoStartBtMacs(context)
+        val anyPhone = Settings.getAutoStartAnyPhone(context)
 
-        if (targetMacs.isEmpty()) return
+        if (targetMacs.isEmpty() && !anyPhone) return
         
         val isLocked = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && 
                       !(context.getSystemService(Context.USER_SERVICE) as UserManager).isUserUnlocked
@@ -49,7 +50,11 @@ class AutoStartReceiver : BroadcastReceiver() {
 
             AppLog.i("BT Device connected: ${device?.name} (${device?.address})")
 
-            if (device != null && targetMacs.contains(device.address)) {
+            // "Any phone" only matches devices Android classes as a phone, so a speaker or a
+            // headset connecting does not start Android Auto.
+            val isPhone = device?.bluetoothClass?.majorDeviceClass ==
+                android.bluetooth.BluetoothClass.Device.Major.PHONE
+            if (device != null && (targetMacs.contains(device.address) || (anyPhone && isPhone))) {
                 AppLog.i("MATCH! Starting AapService via Bluetooth Auto-start...")
 
                 // Start the service to make the app alive. Explicit action so onStartCommand

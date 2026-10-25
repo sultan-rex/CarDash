@@ -251,7 +251,7 @@ class Settings(private val context: Context) {
 
     /** Mirror phone now-playing (title, artist, duration, art) in the system media session. */
     var syncMediaSessionWithAaMetadata: Boolean
-        get() = prefs.getBoolean(KEY_SYNC_MEDIA_SESSION_AA_METADATA, false)
+        get() = prefs.getBoolean(KEY_SYNC_MEDIA_SESSION_AA_METADATA, true)
         set(value) {
             prefs.edit().putBoolean(KEY_SYNC_MEDIA_SESSION_AA_METADATA, value).apply()
         }
@@ -1473,6 +1473,11 @@ class Settings(private val context: Context) {
         get() = prefs.getString("auto-start-bt-name", "")!!
         set(value) { prefs.edit().putString("auto-start-bt-name", value).apply() }
 
+    /** Start Android Auto when any phone connects over Bluetooth, not only the chosen ones. */
+    var autoStartAnyPhone: Boolean
+        get() = prefs.getBoolean(KEY_AUTO_START_ANY_PHONE, false)
+        set(value) { prefs.edit().putBoolean(KEY_AUTO_START_ANY_PHONE, value).apply() }
+
     /**
      * Phones the auto-start offer has already been answered for, so a "no" is not asked twice.
      *
@@ -2053,6 +2058,7 @@ class Settings(private val context: Context) {
         private const val KEY_LISTEN_FOR_USB_DEVICES = "listen-for-usb-devices"
         private const val KEY_AUTO_START_BT_MAC = "auto-start-bt-mac"
         private const val KEY_AUTO_START_BT_MACS = "auto-start-bt-macs"
+        private const val KEY_AUTO_START_ANY_PHONE = "auto-start-any-phone"
 
         /**
          * Reads auto-start-on-usb from device-protected storage (API 24+),
@@ -2197,6 +2203,25 @@ class Settings(private val context: Context) {
                 macs = if (legacyMac.isNotEmpty()) setOf(legacyMac) else emptySet()
             }
             return macs
+        }
+
+        /** Read by the Bluetooth receiver, so it also lives in device-protected storage (Android 7+). */
+        fun getAutoStartAnyPhone(context: Context): Boolean {
+            val prefs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.createDeviceProtectedStorageContext()
+                    .getSharedPreferences(DEVICE_PREFS_NAME, Context.MODE_PRIVATE)
+            } else {
+                context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+            }
+            return prefs.getBoolean(KEY_AUTO_START_ANY_PHONE, false)
+        }
+
+        fun syncAutoStartAnyPhoneToDeviceStorage(context: Context, on: Boolean) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.createDeviceProtectedStorageContext()
+                    .getSharedPreferences(DEVICE_PREFS_NAME, Context.MODE_PRIVATE)
+                    .edit().putBoolean(KEY_AUTO_START_ANY_PHONE, on).apply()
+            }
         }
 
         fun syncAutoStartBtMacsToDeviceStorage(context: Context, macs: Set<String>) {

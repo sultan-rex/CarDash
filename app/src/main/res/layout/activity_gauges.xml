@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            style="@style/IconButton"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Gauges"
+            android:textColor="@color/text"
+            android:textSize="28sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/obd_dot"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:src="@drawable/dot" />
+
+        <TextView
+            android:id="@+id/obd_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/text_dim"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_dtc"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:background="@drawable/tile_bg"
+            android:drawableStart="@drawable/ic_warning_red"
+            android:drawablePadding="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Fault codes"
+            android:textAllCaps="false"
+            android:textColor="@color/text"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_speed"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="0"
+            app:majorTicks="11"
+            app:maxValue="220"
+            app:minValue="0"
+            app:title="Speed"
+            app:unit="km/h" />
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_rpm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="0"
+            app:majorTicks="9"
+            app:maxValue="8000"
+            app:minValue="0"
+            app:title="RPM"
+            app:unit="rpm"
+            app:warnValue="6000" />
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_coolant"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="0"
+            app:majorTicks="10"
+            app:maxValue="130"
+            app:minValue="40"
+            app:title="Coolant"
+            app:unit="°C"
+            app:warnValue="105" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_throttle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="0"
+            app:majorTicks="6"
+            app:maxValue="100"
+            app:minValue="0"
+            app:title="Throttle"
+            app:unit="%" />
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_load"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="0"
+            app:majorTicks="6"
+            app:maxValue="100"
+            app:minValue="0"
+            app:title="Engine load"
+            app:unit="%" />
+
+        <com.sulthan.cardash.GaugeView
+            android:id="@+id/g_volt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:decimals="1"
+            app:majorTicks="7"
+            app:maxValue="16"
+            app:minValue="10"
+            app:title="Battery"
+            app:unit="V"
+            app:warnValue="15" />
+    </LinearLayout>
+</LinearLayout>

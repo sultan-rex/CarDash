@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="OBD-II adapter (gauges)">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="obd_enabled"
+            android:summary="Connect to a Bluetooth ELM327 adapter"
+            android:title="Use OBD-II adapter" />
+        <ListPreference
+            android:dependency="obd_enabled"
+            android:key="obd_device"
+            android:title="Adapter" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="demo_mode"
+            android:summary="Show simulated engine data (for testing without a car)"
+            android:title="Demo mode" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Units">
+        <ListPreference
+            android:defaultValue="kmh"
+            android:entries="@array/speed_units"
+            android:entryValues="@array/speed_unit_values"
+            android:key="speed_unit"
+            android:summary="%s"
+            android:title="Speed" />
+        <ListPreference
+            android:defaultValue="c"
+            android:entries="@array/temp_units"
+            android:entryValues="@array/temp_unit_values"
+            android:key="temp_unit"
+            android:summary="%s"
+            android:title="Temperature" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Android Auto">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="aa_autolaunch"
+            android:summary="Open Android Auto when the tablet joins your phone's hotspot"
+            android:title="Auto-start wireless Android Auto" />
+        <EditTextPreference
+            android:dependency="aa_autolaunch"
+            android:key="aa_ssid"
+            android:singleLine="true"
+            android:title="Phone hotspot name (SSID)" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Navigation">
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/nav_apps"
+            android:entryValues="@array/nav_app_values"
+            android:key="nav_app"
+            android:summary="%s"
+            android:title="Navigation app" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Startup">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="launch_on_power"
+            android:summary="Open CarDash when the tablet starts charging (car ignition on)"
+            android:title="Start with the car" />
+        <Preference
+            android:key="home_screen"
+            android:summary="Make CarDash the tablet's home screen"
+            android:title="Set as home app" />
+        <Preference
+            android:key="media_access"
+            android:summary="Needed to show and control what's playing"
+            android:title="Allow now-playing access" />
+    </PreferenceCategory>
+</PreferenceScreen>

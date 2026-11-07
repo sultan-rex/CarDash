@@ -26,4 +26,32 @@
         <item>day</item>
         <item>night</item>
     </string-array>
+    <string-array name="alert_coolant">
+        <item>Off</item>
+        <item>Above 100 °C (212 °F)</item>
+        <item>Above 105 °C (221 °F)</item>
+        <item>Above 110 °C (230 °F)</item>
+        <item>Above 115 °C (239 °F)</item>
+    </string-array>
+    <string-array name="alert_coolant_values">
+        <item>off</item>
+        <item>100</item>
+        <item>105</item>
+        <item>110</item>
+        <item>115</item>
+    </string-array>
+    <string-array name="saver_minutes">
+        <item>Off</item>
+        <item>Turn off Wi-Fi, Bluetooth and GPS after 2 minutes asleep</item>
+        <item>Turn off Wi-Fi, Bluetooth and GPS after 5 minutes asleep</item>
+        <item>Turn off Wi-Fi, Bluetooth and GPS after 10 minutes asleep</item>
+        <item>Turn off Wi-Fi, Bluetooth and GPS after 30 minutes asleep</item>
+    </string-array>
+    <string-array name="saver_minutes_values">
+        <item>0</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>30</item>
+    </string-array>
 </resources>

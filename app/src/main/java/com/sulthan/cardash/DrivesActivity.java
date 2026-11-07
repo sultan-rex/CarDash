@@ -14,7 +14,8 @@ public class DrivesActivity extends Activity {
     private Prefs prefs;
     private DriveLog log;
     private CalendarGridView grid;
-    private TextView month, date, km, kmUnit, top, time, avg, monthKm, monthDays, monthTop, empty;
+    private TextView month, date, km, kmUnit, top, time, avg, monthKm, monthDays, monthTop, empty, fuel, monthFuel;
+    private FuelLog.Stats fuelStats;
     private int year, month0;
 
     @Override
@@ -40,6 +41,9 @@ public class DrivesActivity extends Activity {
         monthDays = findViewById(R.id.d_month_days);
         monthTop = findViewById(R.id.d_month_top);
         empty = findViewById(R.id.d_empty);
+        fuel = findViewById(R.id.d_fuel);
+        monthFuel = findViewById(R.id.d_month_fuel);
+        findViewById(R.id.d_export).setOnClickListener(v -> exportCsv());
 
         findViewById(R.id.d_back).setOnClickListener(v -> finish());
         findViewById(R.id.d_prev).setOnClickListener(v -> shift(-1));
@@ -56,6 +60,7 @@ public class DrivesActivity extends Activity {
         super.onStart();
         log.flush(); // include what the recorder has counted so far
         grid.setLog(log, prefs.mph());
+        fuelStats = new FuelLog(this).stats();
         showMonth(year, month0);
     }
 
@@ -83,6 +88,7 @@ public class DrivesActivity extends Activity {
         monthKm.setText(distance(log.monthKm(y, m0)));
         monthDays.setText(String.valueOf(log.monthDays(y, m0)));
         monthTop.setText(speed(log.monthTop(y, m0)));
+        monthFuel.setText(fuelFor(log.monthKm(y, m0)));
         empty.setVisibility(log.isEmpty() ? View.VISIBLE : View.GONE);
 
         Calendar now = Calendar.getInstance();
@@ -98,6 +104,7 @@ public class DrivesActivity extends Activity {
             top.setText("--");
             time.setText("--");
             avg.setText("--");
+            fuel.setText("--");
             return;
         }
         Calendar c = Calendar.getInstance();
@@ -110,6 +117,34 @@ public class DrivesActivity extends Activity {
         top.setText(drove ? speed(day.topKmh) : "--");
         time.setText(drove ? duration(day.movingSec) : "--");
         avg.setText(drove ? speed(day.avgKmh()) : "--");
+        fuel.setText(drove ? fuelFor(day.km) : "--");
+    }
+
+    /**
+     * Fuel for a distance at the car's average consumption from the fuel log (full-to-full fill-ups),
+     * with its cost at the average price paid. "--" until the log has enough fill-ups.
+     */
+    private String fuelFor(double km) {
+        if (fuelStats == null || Double.isNaN(fuelStats.avgL100) || km <= 0.05) return "--";
+        double litres = km * fuelStats.avgL100 / 100.0;
+        String vol = prefs.mph() ? String.format(Locale.getDefault(), "%.1f gal", litres * 0.264172)
+                : String.format(Locale.getDefault(), "%.1f L", litres);
+        if (Double.isNaN(fuelStats.avgPricePerLitre)) return vol;
+        return vol + "  ·  " + java.text.NumberFormat.getCurrencyInstance().format(litres * fuelStats.avgPricePerLitre);
+    }
+
+    private void exportCsv() {
+        try {
+            java.io.File dir = Backup.exportCsv(this);
+            new android.app.AlertDialog.Builder(this, ThemeMode.dialogTheme(this))
+                    .setTitle("Exported")
+                    .setMessage("drives.csv and fuel.csv are in " + dir.getPath()
+                            + ".\n\nConnect the tablet to a computer to copy them; they open in any spreadsheet app.")
+                    .setPositiveButton("OK", null)
+                    .show();
+        } catch (java.io.IOException e) {
+            android.widget.Toast.makeText(this, "Export failed: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+        }
     }
 
     private String distance(double km) {

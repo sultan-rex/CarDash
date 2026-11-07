@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageButton btnMute, btnDim;
     private android.media.AudioManager audio;
     private boolean slidersBusy; // a finger is on a slider, so do not fight it with a refresh
-    private TextView sTopDay, sTopMonth, sKmDay, sKmDayLabel;
+    private TextView sTopDay, sTopMonth, sKmDay, sKmDayLabel, sService;
     private View aaTile;
     private ImageView aaIcon;
     private TextView aaStatus;
@@ -109,6 +109,9 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         sKmDay = findViewById(R.id.s_km_day);
         sKmDayLabel = findViewById(R.id.s_km_day_label);
         findViewById(R.id.btn_drives).setOnClickListener(v -> startActivity(new Intent(this, DrivesActivity.class)));
+        sService = findViewById(R.id.s_service);
+        findViewById(R.id.btn_service).setOnClickListener(v -> ServiceUi.show(this));
+        findViewById(R.id.btn_hud).setOnClickListener(v -> startActivity(new Intent(this, HudActivity.class)));
         appliedNight = ThemeMode.night(this);
         btnTheme = findViewById(R.id.btn_theme);
         btnTheme.setOnClickListener(v -> showThemeDialog());
@@ -144,6 +147,14 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         sessions = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
         registerReceiver(wifiReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
         requestRuntimePermissions();
+        CrashGuard.recover(this, getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        CrashGuard.recover(this, intent);
     }
 
     private final BroadcastReceiver plugReceiver = new BroadcastReceiver() {
@@ -320,6 +331,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         if (prefs.fahrenheit()) gCoolant.setRange(100, 266, 221, "°F");
         else gCoolant.setRange(40, 130, 105, "°C");
         fuel.refresh();
+        setIfChanged(sService, ServiceUi.summary(this));
+        ServiceUi.remindIfDue(this);
         connect.start();
         ui.post(aaPoll);
         render();
@@ -334,6 +347,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         ui.removeCallbacks(aaPoll);
         stopGps();
         disconnectMedia();
+        BatterySaver.arm(this); // on battery, going to sleep: start the saver's countdown
         super.onStop();
     }
 
@@ -444,8 +458,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
             if (codes.isEmpty()) {
                 b.setMessage("No stored fault codes.").setPositiveButton("OK", null);
             } else {
-                b.setMessage(TextUtils.join("\n", codes)
-                                + "\n\nLook these codes up for your car model to see what they mean.")
+                StringBuilder sb = new StringBuilder();
+                for (String code : codes) sb.append(code).append("   ").append(DtcInfo.describe(code)).append("\n\n");
+                sb.append("These are the general meanings. A repair manual for your car model gives the exact cause.");
+                b.setMessage(sb.toString())
                         .setPositiveButton("OK", null)
                         .setNegativeButton("Clear codes", (dlg, w) -> confirmClear());
             }

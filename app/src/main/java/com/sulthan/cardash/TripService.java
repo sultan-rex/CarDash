@@ -17,7 +17,7 @@ import android.preference.PreferenceManager;
 /**
  * Records drives in the background, so distance and top speed keep counting while Android Auto is
  * on screen. Once a second it takes the speed from the OBD-II adapter when that is connected,
- * otherwise from GPS, and adds it to [DriveLog].
+ * otherwise from GPS, and adds it to [DriveLog]. The same readings drive the warnings ([Alerts]).
  */
 public class TripService extends Service implements LocationListener {
     static final String PREF_ENABLED = "trip_tracking";
@@ -29,6 +29,8 @@ public class TripService extends Service implements LocationListener {
 
     private final Handler ui = new Handler(Looper.getMainLooper());
     private DriveLog log;
+    private Alerts alerts;
+    private SharedPreferences sp;
     private LocationManager lm;
     private long lastTick;
     private double gpsKmh = Double.NaN;
@@ -39,17 +41,26 @@ public class TripService extends Service implements LocationListener {
             long now = SystemClock.elapsedRealtime();
             double dt = lastTick == 0 ? 0 : (now - lastTick) / 1000.0;
             lastTick = now;
-            log.add(System.currentTimeMillis(), currentSpeed(now), dt);
+            double speed = currentSpeed(now);
+            if (sp.getBoolean(PREF_ENABLED, true)) log.add(System.currentTimeMillis(), speed, dt);
+            alerts.tick(speed);
             ui.postDelayed(this, TICK_MS);
         }
     };
 
-    /** Starts or stops the recorder to match the setting. */
+    /**
+     * Starts or stops the service to match the settings. It runs while drives are recorded or any
+     * warning is on, and pauses while the battery saver has the car switched off.
+     */
     static void sync(Context ctx) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
         Intent i = new Intent(ctx, TripService.class);
-        if (sp.getBoolean(PREF_ENABLED, true)) ctx.startService(i);
+        if (wanted(ctx)) ctx.startService(i);
         else ctx.stopService(i);
+    }
+
+    private static boolean wanted(Context ctx) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return (sp.getBoolean(PREF_ENABLED, true) || Alerts.anyEnabled(sp)) && !BatterySaver.isSaving(ctx);
     }
 
     @Override public IBinder onBind(Intent intent) { return null; }
@@ -58,12 +69,14 @@ public class TripService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         log = DriveLog.get(this);
+        alerts = new Alerts(this);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
         lm = (LocationManager) getSystemService(LOCATION_SERVICE);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREF_ENABLED, true)) {
+        if (!wanted(this)) {
             stopSelf();
             return START_NOT_STICKY;
         }

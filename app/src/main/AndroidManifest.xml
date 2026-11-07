@@ -24,6 +24,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Backups, CSV exports and the crash log go to the CarDash folder, where a computer can copy them. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
@@ -105,11 +108,29 @@
         </service>
 
         <receiver
+            android:name=".BatterySaver"
+            android:exported="false" />
+
+        <!-- Created before anything else in the app, so crashes are caught from the start. -->
+        <provider
+            android:name=".CrashGuard"
+            android:authorities="com.sulthan.cardash.crashguard"
+            android:exported="false"
+            android:initOrder="1000" />
+
+        <activity
+            android:name=".HudActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/CdAppTheme" />
+
+        <receiver
             android:name=".PowerReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
     </application>

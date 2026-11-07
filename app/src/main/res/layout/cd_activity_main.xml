@@ -500,12 +500,12 @@
 
                 <LinearLayout style="@style/StatBox">
                     <TextView android:id="@+id/s_top_day" style="@style/FuelValue" />
-                    <TextView style="@style/StatLabel" android:text="Top speed today" />
+                    <TextView style="@style/StatLabel" android:text="Top today" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/StatBox">
                     <TextView android:id="@+id/s_top_month" style="@style/FuelValue" />
-                    <TextView style="@style/StatLabel" android:text="Top speed this month" />
+                    <TextView style="@style/StatLabel" android:text="Top this month" />
                 </LinearLayout>
 
                 <LinearLayout style="@style/StatBox">
@@ -514,7 +514,35 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/btn_service"
+                    style="@style/StatBox"
+                    android:background="@drawable/tile_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <TextView
+                        style="@style/FuelValue"
+                        android:text="Service  ›"
+                        android:textColor="@color/accent" />
+                    <TextView android:id="@+id/s_service" style="@style/StatLabel" android:text="" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_hud"
+                    style="@style/StatBox"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/tile_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <TextView
+                        style="@style/FuelValue"
+                        android:text="HUD  ›"
+                        android:textColor="@color/accent" />
+                    <TextView style="@style/StatLabel" android:text="Windshield" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/btn_drives"
+                    android:layout_marginStart="6dp"
                     style="@style/StatBox"
                     android:background="@drawable/tile_bg"
                     android:clickable="true"

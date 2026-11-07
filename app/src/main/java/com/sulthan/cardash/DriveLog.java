@@ -127,6 +127,26 @@ final class DriveLog {
         return d.date.startsWith(String.format(Locale.US, "%04d-%02d-", year, month0 + 1));
     }
 
+    /** Distance recorded on the days after [dayKey] (that day itself not included). */
+    synchronized double kmAfter(String dayKey) {
+        double km = 0;
+        for (Day d : days.values()) if (d.date.compareTo(dayKey) > 0) km += d.km;
+        return km;
+    }
+
+    /** Every recorded day, oldest first (copies). */
+    synchronized java.util.List<Day> allDays() {
+        java.util.List<Day> out = new java.util.ArrayList<>();
+        for (Day d : days.values()) {
+            Day c = new Day(d.date);
+            c.km = d.km;
+            c.topKmh = d.topKmh;
+            c.movingSec = d.movingSec;
+            out.add(c);
+        }
+        return out;
+    }
+
     synchronized boolean isEmpty() { return days.isEmpty(); }
 
     synchronized void clear() {

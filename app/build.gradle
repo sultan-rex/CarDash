@@ -18,10 +18,31 @@ android {
         ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
     }
 
+    // Release signing: the key and its passwords live outside the repo. local.properties (not in git)
+    // names a properties file with storeFile, storePassword, keyAlias and keyPassword. Without it the
+    // release build falls back to the debug key.
+    def local = new Properties()
+    def localFile = rootProject.file('local.properties')
+    if (localFile.exists()) localFile.withInputStream { local.load(it) }
+    def signingPath = local.getProperty('cardash.signing')
+    def signing = new Properties()
+    if (signingPath != null && file(signingPath).exists()) file(signingPath).withInputStream { signing.load(it) }
+
+    signingConfigs {
+        if (signing.getProperty('storeFile') != null) {
+            release {
+                storeFile file(signing.getProperty('storeFile'))
+                storePassword signing.getProperty('storePassword')
+                keyAlias signing.getProperty('keyAlias')
+                keyPassword signing.getProperty('keyPassword')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.debug
+            signingConfig signing.getProperty('storeFile') != null ? signingConfigs.release : signingConfigs.debug
         }
     }
 

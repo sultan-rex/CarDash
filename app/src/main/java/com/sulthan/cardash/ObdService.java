@@ -19,7 +19,7 @@ public class ObdService extends Service {
     /** Starts or stops the service to match the current settings. */
     public static void sync(Context ctx) {
         Intent i = new Intent(ctx, ObdService.class);
-        if (new Prefs(ctx).wantsObd()) {
+        if (new Prefs(ctx).wantsObd() && !BatterySaver.isSaving(ctx)) {
             if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i);
             else ctx.startService(i);
         } else {
@@ -30,7 +30,7 @@ public class ObdService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Prefs prefs = new Prefs(this);
-        if (!prefs.wantsObd()) {
+        if (!prefs.wantsObd() || BatterySaver.isSaving(this)) {
             stopSelf();
             return START_NOT_STICKY;
         }

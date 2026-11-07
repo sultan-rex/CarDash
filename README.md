@@ -11,9 +11,31 @@ The same choice is in Settings -> Look. (The Android Auto screen itself keeps it
 The home screen has three pages you swipe between:
 
 1. **Home:** clock, now playing, the Android Auto and Gauges tiles, vertical brightness and volume sliders down the right edge, and a row of engine readouts.
-2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, the fault-code reader, and a strip
-   with today's top speed, this month's top speed, today's distance and a **Drives** calendar.
+2. **Gauges:** an analog speedometer and the RPM, coolant, throttle, load and battery gauges, the fault-code reader (each
+   code with its meaning in plain words, and a clear button), and a strip with today's top speed, this month's top speed,
+   today's distance, **Service** reminders, the **HUD** windshield mode and the **Drives** calendar (with an estimated fuel
+   use and cost per day once the fuel log has two full-tank fill-ups, and an *Export* button for spreadsheet CSV files).
 3. **Fuel:** a fill-up log with consumption and cost statistics.
+
+### Warnings, service, backup and battery
+
+- **Warnings** (Settings → Warnings): a banner across the top of any screen, Android Auto included, with three beeps when the
+  engine runs too hot (default above 110 °C), the car battery is low (under 11.8 V, engine off) or not charging (under 12.8 V,
+  engine running), or when you go over a chosen speed. Each condition must last a few seconds, and a warning fires once
+  until the reading recovers. Engine and battery warnings need the OBD-II adapter; the speed warning also works from GPS.
+- **Service:** jobs such as an oil change repeat every so many km and/or months. *Mark as done* records the odometer, which
+  also corrects the odometer estimate (last reading typed in plus distance recorded since). A banner shows once a day
+  when a job is due.
+- **HUD:** the speed, very large on black, flipped so it can be read reflected in the windshield. Tap to change the flip
+  (top to bottom, left to right, none); back or a long press leaves.
+- **Backup** (Settings → Backup): one file with every CarDash and Android Auto setting, the fuel log, drives and service
+  reminders, in the tablet's `CarDash` folder. *Restore from backup* reads it back and restarts the app.
+- **Battery saver** (Settings → Battery saver, default 10 minutes): after the car is switched off (charging stops) and the
+  tablet is asleep, Wi-Fi, Bluetooth, GPS recording and the OBD connection are switched off; they come back when charging
+  starts. It waits while the screen is on.
+- **Crash recovery:** a crash is written to a crash log (Settings → Problems, also `CarDash/crash.log`) and the app reopens
+  by itself; if Android Auto was connected, it starts the connection again. After four crashes in ten minutes it stops
+  restarting. Crashes in native (C++) code are not caught.
 
 ## Build and install
 
@@ -24,6 +46,11 @@ Requirements: JDK 21, Android SDK platform 36, build-tools 36.1.0, NDK 29.0.1420
     adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Set `sdk.dir` in `local.properties` if Android Studio has not already.
+
+Release build: `./gradlew assembleRelease`. To sign it with your own key, put `cardash.signing=/path/to/keystore.properties`
+in `local.properties`; that file holds `storeFile`, `storePassword`, `keyAlias` and `keyPassword`. Keep both out of git.
+Without it the release build uses the debug key. A build signed with a different key cannot be installed over the old one:
+Android asks for an uninstall first, which deletes the app's data (back it up first).
 
 ## Setup on the tablet
 

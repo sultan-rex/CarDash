@@ -13,6 +13,30 @@
             android:title="Adapter" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Warnings">
+        <ListPreference
+            android:defaultValue="110"
+            android:entries="@array/alert_coolant"
+            android:entryValues="@array/alert_coolant_values"
+            android:key="alert_coolant"
+            android:summary="%s"
+            android:title="Engine too hot" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="alert_battery"
+            android:summary="Warn when the car battery is low (under 11.8 V, engine off) or not charging (under 12.8 V, engine running)"
+            android:title="Car battery" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="alert_speed"
+            android:singleLine="true"
+            android:title="Speed alert" />
+        <Preference
+            android:key="alert_test"
+            android:summary="Show a sample warning with its chime"
+            android:title="Test a warning" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Units">
         <ListPreference
             android:defaultValue="kmh"
@@ -83,9 +107,44 @@
             android:summary="Record distance and top speed each day, from the OBD-II adapter or GPS (turn on Location for GPS)"
             android:title="Record drives" />
         <Preference
+            android:key="export_csv"
+            android:summary="Save drives.csv and fuel.csv for a spreadsheet"
+            android:title="Export drives and fuel" />
+        <Preference
             android:key="clear_drives"
             android:summary="Delete every recorded day"
             android:title="Clear drive history" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Battery saver">
+        <ListPreference
+            android:defaultValue="10"
+            android:entries="@array/saver_minutes"
+            android:entryValues="@array/saver_minutes_values"
+            android:key="saver_minutes"
+            android:summary="%s"
+            android:title="When the car is switched off" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Backup">
+        <Preference
+            android:key="backup_export"
+            android:title="Back up settings and history" />
+        <Preference
+            android:key="backup_import"
+            android:title="Restore from backup" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cat_problems"
+        android:title="Problems">
+        <Preference
+            android:key="crash_log"
+            android:title="Crash log" />
+        <Preference
+            android:key="crash_test"
+            android:summary="Crash the app on purpose to check it comes back (test builds only)"
+            android:title="Test crash recovery" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Startup">

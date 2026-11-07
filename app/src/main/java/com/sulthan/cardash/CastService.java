@@ -74,7 +74,7 @@ public class CastService extends Service {
     static void sync(Context ctx) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
         Intent i = new Intent(ctx, CastService.class);
-        if (sp.getBoolean(PREF_ENABLED, false)) ctx.startService(i);
+        if (sp.getBoolean(PREF_ENABLED, false) && !BatterySaver.isSaving(ctx)) ctx.startService(i);
         else ctx.stopService(i);
     }
 

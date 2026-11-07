@@ -119,6 +119,12 @@
             android:initOrder="1000" />
 
         <activity
+            android:name=".TouchTestActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/CdAppTheme" />
+
+        <activity
             android:name=".HudActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"

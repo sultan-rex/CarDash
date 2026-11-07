@@ -142,6 +142,10 @@
             android:key="crash_log"
             android:title="Crash log" />
         <Preference
+            android:key="touch_test"
+            android:summary="Find the parts of the screen that don't respond to touch"
+            android:title="Touch test" />
+        <Preference
             android:key="crash_test"
             android:summary="Crash the app on purpose to check it comes back (test builds only)"
             android:title="Test crash recovery" />

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Space kept clear at the left and right edges of every page. This tablet's touch glass does not respond in
+         a strip about 51 px wide along one long edge (found with Settings > Problems > Touch test), and the screen
+         can flip 180 degrees, so both sides stay clear of buttons. -->
+    <dimen name="edge_safe">64dp</dimen>
+</resources>

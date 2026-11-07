@@ -126,6 +126,10 @@ public class SettingsActivity extends Activity {
                         .show();
                 return true;
             });
+            findPreference("touch_test").setOnPreferenceClickListener(p -> {
+                startActivity(new android.content.Intent(getActivity(), TouchTestActivity.class));
+                return true;
+            });
             findPreference("crash_log").setOnPreferenceClickListener(p -> {
                 String log = CrashGuard.readLog(getActivity());
                 if (log == null) {

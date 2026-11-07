@@ -431,7 +431,13 @@ public class MainActivity extends Activity implements ObdManager.Listener {
 
     private void render() {
         // OBD speed is more accurate; use GPS until the adapter is connected (or if it reports none).
-        double speed = obdConnected && !Double.isNaN(lastObd.speedKmh) ? lastObd.speedKmh : gpsSpeedKmh;
+        boolean fromObd = obdConnected && !Double.isNaN(lastObd.speedKmh);
+        double speed = fromObd ? lastObd.speedKmh : gpsSpeedKmh;
+        // Which source the speed comes from, so it is clear when the adapter's speed is missing.
+        String source = fromObd ? "OBD" : Double.isNaN(gpsSpeedKmh) ? "" : "GPS";
+        String unitLine = source.isEmpty() ? prefs.speedUnit() : prefs.speedUnit() + " · " + source;
+        speedo.setUnit(unitLine);
+        setIfChanged(statSpeedLabel, unitLine);
         double shownSpeed = Double.isNaN(speed) ? speed : prefs.speed(speed);
         statSpeed.setText(fmt(shownSpeed, 0));
         speedo.setValue(shownSpeed);

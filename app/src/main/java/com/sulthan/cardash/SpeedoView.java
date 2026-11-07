@@ -69,6 +69,13 @@ public class SpeedoView extends View {
         invalidate();
     }
 
+    /** The unit line under the number, e.g. "km/h · OBD". */
+    public void setUnit(String unit) {
+        if (unit.equals(this.unit)) return;
+        this.unit = unit;
+        invalidate();
+    }
+
     /** NaN shows "--" and rests the needle at zero. */
     public void setValue(double v) {
         target = (float) v;

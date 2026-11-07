@@ -170,8 +170,19 @@ public final class ObdManager {
     private static final String[] FAST = {"0C", "0D"};
     private static final String[] SLOW = {"05", "11", "04", "0F", "RV"};
 
+    /**
+     * A PID that fails this many times in a row is set aside, then asked again after a pause:
+     * a car whose engine computer is still waking up (ignition on, engine not started) answers
+     * NO DATA at first, and giving up for good would leave speed and RPM blank for the whole drive.
+     */
+    private static final int MAX_MISSES = 3;
+    private static final long RETRY_FAST_MS = 5_000;
+    private static final long RETRY_SLOW_MS = 30_000;
+    private final Map<String, Long> skippedUntil = new HashMap<>();
+
     private void pollLoop(Elm elm) throws IOException {
         Map<String, Integer> misses = new HashMap<>();
+        skippedUntil.clear();
         int slowIdx = 0;
         while (alive()) {
             for (String pid : FAST) readPid(elm, pid, misses);
@@ -187,13 +198,27 @@ public final class ObdManager {
 
     private void readPid(Elm elm, String pid, Map<String, Integer> misses) throws IOException {
         Integer m = misses.get(pid);
-        if (m != null && m >= 3) return; // car doesn't support this PID
+        if (m != null && m >= MAX_MISSES) {
+            Long until = skippedUntil.get(pid);
+            long now = SystemClock.elapsedRealtime();
+            if (until == null) {
+                // Just failed for the third time: show "--" rather than an old value, and wait.
+                skippedUntil.put(pid, now + (isFast(pid) ? RETRY_FAST_MS : RETRY_SLOW_MS));
+                clearPid(pid);
+                return;
+            }
+            if (now < until) return;
+            skippedUntil.remove(pid);
+            m = MAX_MISSES - 1; // one more try; a failure sets it aside again
+            misses.put(pid, m);
+        }
 
         if (pid.equals("RV")) {
             String r = elm.send("ATRV", 1000);
             try {
                 double v = Double.parseDouble(r.replaceAll("[^0-9.]", ""));
                 synchronized (this) { data.voltage = v; }
+                misses.remove(pid); // only a run of failures in a row counts
             } catch (NumberFormatException e) {
                 misses.put(pid, m == null ? 1 : m + 1);
             }
@@ -206,6 +231,7 @@ public final class ObdManager {
             return;
         }
         misses.remove(pid);
+        skippedUntil.remove(pid);
         synchronized (this) {
             switch (pid) {
                 case "0C": if (b.length >= 2) data.rpm = (b[0] * 256 + b[1]) / 4.0; break;
@@ -231,6 +257,23 @@ public final class ObdManager {
         String r = elm.send("03", 5000);
         List<String> codes = decodeDtcs(r, can);
         main.post(() -> job.cb.onResult(codes, codes == null ? "No response (" + r + ")" : null));
+    }
+
+    private static boolean isFast(String pid) {
+        for (String f : FAST) if (f.equals(pid)) return true;
+        return false;
+    }
+
+    private synchronized void clearPid(String pid) {
+        switch (pid) {
+            case "0C": data.rpm = Double.NaN; break;
+            case "0D": data.speedKmh = Double.NaN; break;
+            case "05": data.coolantC = Double.NaN; break;
+            case "11": data.throttlePct = Double.NaN; break;
+            case "04": data.loadPct = Double.NaN; break;
+            case "0F": data.intakeC = Double.NaN; break;
+            case "RV": data.voltage = Double.NaN; break;
+        }
     }
 
     // ------------------------------------------------------------- parsing

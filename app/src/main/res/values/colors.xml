@@ -3,6 +3,8 @@
 <resources>
     <color name="bg">#F6F6F4</color>
     <color name="card">#FFFFFF</color>
+    <color name="card_stroke">#E2E2DE</color>
+    <color name="accent_soft">#140B8F85</color>
     <color name="card_pressed">#E4E4E1</color>
     <color name="line">#D9D9D5</color>
     <color name="text">#141414</color>

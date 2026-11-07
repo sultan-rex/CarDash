@@ -144,21 +144,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="@drawable/round_ripple"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/tile_bg"
                     android:clickable="true"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="24dp">
 
                     <ImageView
                         android:id="@+id/np_art"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
                         android:background="@drawable/art_bg"
                         android:clipToOutline="true"
-                        android:padding="0dp"
                         android:scaleType="centerCrop"
+                        android:padding="28dp"
                         android:src="@drawable/ic_music"
-                        android:tint="@color/track" />
+                        android:tint="@color/text_dim" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -660,6 +664,11 @@
                         android:textSize="26sp" />
 
                     <TextView
+                        style="@style/StatLabel"
+                        android:layout_marginEnd="16dp"
+                        android:text="Tap one to copy or delete" />
+
+                    <TextView
                         android:id="@+id/btn_fuel_add"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
@@ -684,8 +693,9 @@
                         android:id="@+id/fuel_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:divider="@color/line"
-                        android:dividerHeight="1dp"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="10dp"
+                        android:listSelector="@android:color/transparent"
                         android:scrollbars="none" />
 
                     <TextView
@@ -713,27 +723,30 @@
 
         <ImageView
             android:id="@+id/dot_0"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
-            android:src="@drawable/dot"
+            android:layout_width="28dp"
+            android:layout_height="3dp"
+            android:src="@drawable/page_bar"
+            android:scaleType="fitXY"
             android:tint="@color/text" />
 
         <ImageView
             android:id="@+id/dot_1"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
+            android:layout_width="10dp"
+            android:layout_height="3dp"
             android:layout_marginStart="8dp"
             android:alpha="0.3"
-            android:src="@drawable/dot"
+            android:src="@drawable/page_bar"
+            android:scaleType="fitXY"
             android:tint="@color/text" />
 
         <ImageView
             android:id="@+id/dot_2"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
+            android:layout_width="10dp"
+            android:layout_height="3dp"
             android:layout_marginStart="8dp"
             android:alpha="0.3"
-            android:src="@drawable/dot"
+            android:src="@drawable/page_bar"
+            android:scaleType="fitXY"
             android:tint="@color/text" />
 
     </LinearLayout>

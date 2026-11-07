@@ -46,7 +46,8 @@ final class FuelPage {
         empty = act.findViewById(R.id.fuel_empty);
         list = act.findViewById(R.id.fuel_list);
         list.setEmptyView(empty);
-        act.findViewById(R.id.btn_fuel_add).setOnClickListener(v -> showAddDialog());
+        act.findViewById(R.id.btn_fuel_add).setOnClickListener(v -> showAddDialog(null));
+        list.setOnItemClickListener((p, v, pos, id) -> rowMenu((FuelLog.Entry) p.getItemAtPosition(pos)));
         list.setOnItemLongClickListener((p, v, pos, id) -> {
             confirmDelete((FuelLog.Entry) p.getItemAtPosition(pos));
             return true;
@@ -71,8 +72,13 @@ final class FuelPage {
 
     private String consumptionUnit() { return imperial() ? "mpg" : "L/100 km"; }
 
-    private static String money(double v) {
-        return Double.isNaN(v) ? "--" : NumberFormat.getCurrencyInstance().format(v);
+    /** Money in Indian rupees, whatever region the tablet is set to (a factory reset left it on US dollars). */
+    static String money(double v) {
+        if (Double.isNaN(v)) return "--";
+        NumberFormat nf = NumberFormat.getNumberInstance(new Locale("en", "IN"));
+        nf.setMinimumFractionDigits(2);
+        nf.setMaximumFractionDigits(2);
+        return "\u20B9" + nf.format(v);
     }
 
     // ---------------------------------------------------------------- display
@@ -117,13 +123,28 @@ final class FuelPage {
     // ---------------------------------------------------------------- input
 
     private EditText field(LinearLayout box, String hint, String prefill) {
+        // A label above the field: the hint alone disappears once a value is filled in.
+        android.widget.TextView label = new android.widget.TextView(act);
+        label.setText(hint);
+        label.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12);
+        label.setAllCaps(true);
+        label.setLetterSpacing(0.12f);
+        label.setTextColor(GaugeView.color(act, R.color.accent));
+        label.setPadding(0, Math.round(10 * act.getResources().getDisplayMetrics().density), 0, 0);
+        box.addView(label);
         EditText f = new EditText(act);
-        f.setHint(hint);
+        f.setContentDescription(hint);
         f.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         f.setSingleLine(true);
         if (prefill != null) f.setText(prefill);
         box.addView(f);
         return f;
+    }
+
+    /** 15.0 -> "15", 1751.4 -> "1751.4" (for prefilled fields). */
+    private static String trim(double v) {
+        String t = String.format(Locale.US, "%.2f", v);
+        return t.replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
     private static double num(EditText f) {
@@ -134,24 +155,39 @@ final class FuelPage {
         }
     }
 
-    private void showAddDialog() {
+    /** Tap on a fill-up: add it again (same fuel, cost and full-tank choice) or delete it. */
+    private void rowMenu(FuelLog.Entry e) {
+        new AlertDialog.Builder(act, ThemeMode.dialogTheme(act))
+                .setTitle(String.format(Locale.getDefault(), "%.1f %s  ·  %s", vol(e.litres), volUnit(), money(e.cost)))
+                .setItems(new CharSequence[]{"Add again (copy)", "Delete"}, (dlg, which) -> {
+                    if (which == 0) showAddDialog(e);
+                    else confirmDelete(e);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** [copy], when given, fills in the fuel, cost and full-tank choice; only the odometer needs typing. */
+    private void showAddDialog(FuelLog.Entry copy) {
         LinearLayout box = new LinearLayout(act);
         box.setOrientation(LinearLayout.VERTICAL);
         int pad = (int) (24 * act.getResources().getDisplayMetrics().density);
         box.setPadding(pad, pad / 2, pad, 0);
 
-        double lastOdo = log.lastOdometerKm();
+        // A copy starts from the estimated odometer (last reading plus distance driven since).
+        double lastOdo = copy != null && !Double.isNaN(Odometer.estimateKm(act)) ? Odometer.estimateKm(act) : log.lastOdometerKm();
         EditText odo = field(box, "Odometer (" + distUnit() + ")",
                 Double.isNaN(lastOdo) ? null : String.format(Locale.US, "%.0f", dist(lastOdo)));
-        EditText fuel = field(box, "Fuel added (" + volUnit() + ")", null);
-        EditText cost = field(box, "Total cost", null);
+        EditText fuel = field(box, "Fuel added (" + volUnit() + ")",
+                copy == null ? null : trim(vol(copy.litres)));
+        EditText cost = field(box, "Total cost (\u20B9)", copy == null ? null : trim(copy.cost));
         CheckBox full = new CheckBox(act);
         full.setText("Filled the tank to full");
-        full.setChecked(true);
+        full.setChecked(copy == null || copy.full);
         box.addView(full);
 
         AlertDialog d = new AlertDialog.Builder(act, ThemeMode.dialogTheme(act))
-                .setTitle("Add fill-up")
+                .setTitle(copy == null ? "Add fill-up" : "Add fill-up (copy)")
                 .setView(box)
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Save", null)

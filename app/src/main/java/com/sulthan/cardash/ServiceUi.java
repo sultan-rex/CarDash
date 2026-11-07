@@ -185,8 +185,17 @@ final class ServiceUi {
     }
 
     private static EditText field(Activity act, LinearLayout box, String hint, String prefill) {
+        // A label above the field: the hint alone disappears once a value is filled in.
+        android.widget.TextView label = new android.widget.TextView(act);
+        label.setText(hint);
+        label.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12);
+        label.setAllCaps(true);
+        label.setLetterSpacing(0.12f);
+        label.setTextColor(GaugeView.color(act, R.color.accent));
+        label.setPadding(0, Math.round(10 * act.getResources().getDisplayMetrics().density), 0, 0);
+        box.addView(label);
         EditText f = new EditText(act);
-        f.setHint(hint);
+        f.setContentDescription(hint);
         f.setSingleLine(true);
         f.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (prefill != null) f.setText(prefill);

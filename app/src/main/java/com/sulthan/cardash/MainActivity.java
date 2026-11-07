@@ -123,9 +123,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         aaTile.setOnClickListener(v -> openAndroidAuto());
         pager = findViewById(R.id.pager);
         dots = new View[]{findViewById(R.id.dot_0), findViewById(R.id.dot_1), findViewById(R.id.dot_2)};
-        pager.setOnPageChange(page -> {
-            for (int i = 0; i < dots.length; i++) dots[i].setAlpha(i == page ? 1f : 0.3f);
-        });
+        pager.setOnPageChange(this::showPageBar);
+        showPageBar(0);
         speedo = findViewById(R.id.g_speedo);
         gRpm = findViewById(R.id.g_rpm);
         gCoolant = findViewById(R.id.g_coolant);
@@ -155,6 +154,22 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         super.onNewIntent(intent);
         setIntent(intent);
         CrashGuard.recover(this, intent);
+    }
+
+    /** The page indicator: a long teal bar for the page on screen, short dim bars for the others. */
+    private void showPageBar(int page) {
+        float d = getResources().getDisplayMetrics().density;
+        for (int i = 0; i < dots.length; i++) {
+            boolean on = i == page;
+            android.view.ViewGroup.LayoutParams lp = dots[i].getLayoutParams();
+            int w = Math.round((on ? 28 : 10) * d);
+            if (lp.width != w) {
+                lp.width = w;
+                dots[i].setLayoutParams(lp);
+            }
+            ((ImageView) dots[i]).setImageTintList(ColorStateList.valueOf(GaugeView.color(this, on ? R.color.accent : R.color.text)));
+            dots[i].setAlpha(on ? 1f : 0.3f);
+        }
     }
 
     private final BroadcastReceiver plugReceiver = new BroadcastReceiver() {
@@ -599,10 +614,13 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         if (art == null && md != null) art = md.getBitmap(MediaMetadata.METADATA_KEY_ART);
         if (art != null) {
             npArt.setImageTintList(null);
+            npArt.setPadding(0, 0, 0, 0); // album art fills the square
             npArt.setImageBitmap(art);
         } else {
+            int pad = Math.round(28 * getResources().getDisplayMetrics().density);
+            npArt.setPadding(pad, pad, pad, pad); // a small note in the middle of the square
             npArt.setImageResource(R.drawable.ic_music);
-            npArt.setImageTintList(ColorStateList.valueOf(GaugeView.color(this, R.color.track)));
+            npArt.setImageTintList(ColorStateList.valueOf(GaugeView.color(this, R.color.text_dim)));
         }
         npPlay.setImageResource(isPlaying() ? R.drawable.ic_pause : R.drawable.cd_ic_play);
     }

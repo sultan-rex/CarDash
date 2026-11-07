@@ -130,7 +130,7 @@ public class DrivesActivity extends Activity {
         String vol = prefs.mph() ? String.format(Locale.getDefault(), "%.1f gal", litres * 0.264172)
                 : String.format(Locale.getDefault(), "%.1f L", litres);
         if (Double.isNaN(fuelStats.avgPricePerLitre)) return vol;
-        return vol + "  ·  " + java.text.NumberFormat.getCurrencyInstance().format(litres * fuelStats.avgPricePerLitre);
+        return vol + "  ·  " + FuelPage.money(litres * fuelStats.avgPricePerLitre);
     }
 
     private void exportCsv() {

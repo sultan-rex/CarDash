@@ -19,6 +19,7 @@ public class PagerView extends HorizontalScrollView {
     private int page;
     private int flingDir;
     private OnPageChange listener;
+    private boolean touching;
 
     private final GestureDetector detector = new GestureDetector(getContext(),
             new GestureDetector.SimpleOnGestureListener() {
@@ -38,6 +39,9 @@ public class PagerView extends HorizontalScrollView {
     public void setOnPageChange(OnPageChange l) { listener = l; }
 
     public int page() { return page; }
+
+    /** True while a finger is down; background updates should wait. */
+    public boolean isScrolling() { return touching; }
 
     private int pageCount() {
         return getChildCount() == 0 ? 0 : ((ViewGroup) getChildAt(0)).getChildCount();
@@ -71,10 +75,12 @@ public class PagerView extends HorizontalScrollView {
         detector.onTouchEvent(ev);
         boolean handled = super.onTouchEvent(ev);
         int a = ev.getActionMasked();
+        if (a == MotionEvent.ACTION_DOWN) touching = true;
         if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
             int w = Math.max(1, getWidth());
             int target = flingDir != 0 ? page + flingDir : Math.round(getScrollX() / (float) w);
             flingDir = 0;
+            touching = false;
             goTo(target);
         }
         return handled;

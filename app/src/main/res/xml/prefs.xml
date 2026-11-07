@@ -58,6 +58,24 @@
     </PreferenceCategory>
 
 
+    <PreferenceCategory android:title="Video cast">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="cast_receiver"
+            android:summary="Show CarDash as a DLNA screen in phone apps such as VLC or BubbleUPnP, so a video can be cast to the tablet. YouTube and Netflix cast only to Chromecast and will not list it."
+            android:title="Receive videos from the phone" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Look">
+        <ListPreference
+            android:defaultValue="auto"
+            android:entries="@array/theme_modes"
+            android:entryValues="@array/theme_mode_values"
+            android:key="theme_mode"
+            android:summary="%s"
+            android:title="Day or night theme" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Drives">
         <SwitchPreference
             android:defaultValue="true"

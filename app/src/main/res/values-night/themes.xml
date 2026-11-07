@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Night themes (dark). The day themes are in values/themes.xml. -->
+<resources>
+    <style name="CdAppTheme" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorPrimary">@color/bg</item>
+        <item name="android:colorPrimaryDark">@color/bg</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <style name="SettingsTheme" parent="android:Theme.Material">
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:colorPrimary">@color/card</item>
+        <item name="android:colorPrimaryDark">@color/bg</item>
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+</resources>

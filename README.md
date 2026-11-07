@@ -3,6 +3,11 @@
 A car dashboard for an old Android tablet (built for the Lenovo Tab 3 TB3-710I, Android 5.1).
 OBD-II gauges, a fuel log, and Android Auto built in as a single app.
 
+CarDash has a **day theme** (light) and a **night theme** (dark). By default it follows the clock: night from 7 pm until
+6 am, day the rest of the time, switching by itself even while the app is open. The sun/moon icon in the top bar shows
+which is showing (grey = following the clock, teal = chosen by hand); tap it to pick **Automatic**, **Day** or **Night**.
+The same choice is in Settings -> Look. (The Android Auto screen itself keeps its own day/night setting.)
+
 The home screen has three pages you swipe between:
 
 1. **Home:** clock, now playing, the Android Auto and Gauges tiles, vertical brightness and volume sliders down the right edge, and a row of engine readouts.
@@ -118,7 +123,7 @@ receiving roles switched off. Android Auto is the way to get them.
 
 Notable pieces in `app/`: `MainActivity` (home, pager, Android Auto tile), `PagerView` (swipe pages), `SpeedoView` and
 `GaugeView` (gauges), `FuelLog` and `FuelPage` (fuel), `ConnectControls` (Wi-Fi, Bluetooth and auto-start buttons),
-`SwitchOverlayService` and `SwitchButtonView` (the switch button), `TripService`, `DriveLog`, `DrivesActivity` and
+`ThemeMode` (day and night), `SwitchOverlayService` and `SwitchButtonView` (the switch button), `TripService`, `DriveLog`, `DrivesActivity` and
 `CalendarGridView` (drive recording and the calendar), and `ObdManager` (ELM327 over Bluetooth).
 
 Changes made to the upstream Open Headunit code:

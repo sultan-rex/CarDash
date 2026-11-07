@@ -24,6 +24,11 @@ import java.util.Set;
 public class SettingsActivity extends Activity {
 
     @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(ThemeMode.wrap(base));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
@@ -52,7 +57,7 @@ public class SettingsActivity extends Activity {
                 return false;
             });
             findPreference("clear_drives").setOnPreferenceClickListener(p -> {
-                new android.app.AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert)
+                new android.app.AlertDialog.Builder(getActivity(), ThemeMode.dialogTheme(getActivity()))
                         .setTitle("Clear drive history?")
                         .setMessage("Every recorded day, distance and top speed will be deleted.")
                         .setNegativeButton("Cancel", null)
@@ -101,6 +106,8 @@ public class SettingsActivity extends Activity {
             updateSummaries();
             if ("overlay_switch".equals(key)) SwitchOverlayService.sync(getActivity());
             if ("trip_tracking".equals(key)) TripService.sync(getActivity());
+            if ("cast_receiver".equals(key)) CastService.sync(getActivity());
+            if ("theme_mode".equals(key)) getActivity().recreate();
             if ("obd_enabled".equals(key) || "obd_device".equals(key)) {
                 // Re-delivering the start command reconnects with the new settings.
                 ObdService.sync(getActivity());

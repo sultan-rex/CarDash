@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -69,6 +71,17 @@
         <activity
             android:name=".DrivesActivity"
             android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/CdAppTheme" />
+
+        <service
+            android:name=".CastService"
+            android:exported="false" />
+
+        <activity
+            android:name=".CastPlayerActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/CdAppTheme" />
 

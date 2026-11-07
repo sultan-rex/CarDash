@@ -18,6 +18,11 @@ public class DrivesActivity extends Activity {
     private int year, month0;
 
     @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(ThemeMode.wrap(base));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drives);

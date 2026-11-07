@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CdAppTheme" parent="android:Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:windowBackground">@color/bg</item>
-        <item name="android:colorAccent">@color/accent</item>
-        <item name="android:colorPrimary">@color/bg</item>
-        <item name="android:colorPrimaryDark">@color/bg</item>
-        <item name="android:textColor">@color/text</item>
-    </style>
-
-    <style name="SettingsTheme" parent="android:Theme.Material">
-        <item name="android:colorAccent">@color/accent</item>
-        <item name="android:colorPrimary">@color/card</item>
-        <item name="android:colorPrimaryDark">@color/bg</item>
-        <item name="android:windowBackground">@color/bg</item>
-    </style>
-
     <style name="Tile">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

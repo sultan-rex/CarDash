@@ -135,7 +135,7 @@ final class ConnectControls {
     }
 
     private AlertDialog.Builder dialog(String title) {
-        return new AlertDialog.Builder(act, android.R.style.Theme_Material_Dialog_Alert).setTitle(title);
+        return new AlertDialog.Builder(act, ThemeMode.dialogTheme(act)).setTitle(title);
     }
 
     private void openSettings(String action) {

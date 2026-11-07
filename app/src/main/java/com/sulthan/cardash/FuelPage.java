@@ -150,7 +150,7 @@ final class FuelPage {
         full.setChecked(true);
         box.addView(full);
 
-        AlertDialog d = new AlertDialog.Builder(act, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog d = new AlertDialog.Builder(act, ThemeMode.dialogTheme(act))
                 .setTitle("Add fill-up")
                 .setView(box)
                 .setNegativeButton("Cancel", null)
@@ -176,7 +176,7 @@ final class FuelPage {
     }
 
     private void confirmDelete(FuelLog.Entry e) {
-        new AlertDialog.Builder(act, android.R.style.Theme_Material_Dialog_Alert)
+        new AlertDialog.Builder(act, ThemeMode.dialogTheme(act))
                 .setTitle("Delete this fill-up?")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Delete", (dlg, w) -> { log.remove(e); refresh(); })

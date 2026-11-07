@@ -44,6 +44,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private ImageButton npPlay;
     private PagerView pager;
     private View[] dots;
+    private ImageButton btnTheme;
+    private boolean appliedNight;
     private VerticalSliderView slVolume, slBrightness;
     private ImageButton btnMute, btnDim;
     private android.media.AudioManager audio;
@@ -56,6 +58,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private final android.os.Handler ui = new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable aaPoll = new Runnable() {
         @Override public void run() {
+            if (pager != null && pager.isScrolling()) { ui.postDelayed(this, 300); return; } // never relayout mid-swipe
+            if (ThemeMode.night(MainActivity.this) != appliedNight) { recreate(); return; } // 7 pm or 6 am passed
             updateAaTile();
             updateDriveStats();
             syncSliders();
@@ -105,6 +109,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         sKmDay = findViewById(R.id.s_km_day);
         sKmDayLabel = findViewById(R.id.s_km_day_label);
         findViewById(R.id.btn_drives).setOnClickListener(v -> startActivity(new Intent(this, DrivesActivity.class)));
+        appliedNight = ThemeMode.night(this);
+        btnTheme = findViewById(R.id.btn_theme);
+        btnTheme.setOnClickListener(v -> showThemeDialog());
+        updateThemeButton();
         setupSliders();
         aaTile = findViewById(R.id.tile_aa);
         aaIcon = findViewById(R.id.tile_aa_icon);
@@ -302,6 +310,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         SwitchOverlayService.sync(this);
         DimService.sync(this);
         TripService.sync(this);
+        CastService.sync(this);
         ObdManager.get().addListener(this);
         startGps();
         connectMedia();
@@ -601,7 +610,41 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         return true;
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(ThemeMode.wrap(base));
+    }
+
+    /** Sun by day, moon at night; teal when the theme was chosen by hand instead of following the clock. */
+    private void updateThemeButton() {
+        boolean manual = !ThemeMode.AUTO.equals(ThemeMode.mode(this));
+        btnTheme.setImageResource(appliedNight ? R.drawable.ic_moon : R.drawable.ic_sun);
+        btnTheme.setImageTintList(android.content.res.ColorStateList.valueOf(
+                GaugeView.color(this, manual ? R.color.accent : R.color.text_dim)));
+    }
+
+    private void showThemeDialog() {
+        final String[] values = {ThemeMode.AUTO, ThemeMode.DAY, ThemeMode.NIGHT};
+        String[] labels = {"Automatic (night 7 pm to 6 am)", "Day", "Night"};
+        String now = ThemeMode.mode(this);
+        int checked = ThemeMode.DAY.equals(now) ? 1 : ThemeMode.NIGHT.equals(now) ? 2 : 0;
+        new AlertDialog.Builder(this, ThemeMode.dialogTheme(this))
+                .setTitle("Theme")
+                .setSingleChoiceItems(labels, checked, (d, which) -> {
+                    ThemeMode.setMode(this, values[which]);
+                    d.dismiss();
+                    if (ThemeMode.night(this) != appliedNight) recreate(); else updateThemeButton();
+                })
+                .setNegativeButton("Close", null)
+                .show();
+    }
+
     /** Today's and this month's top speed, and today's distance, from the drive recorder. */
+    /** setText relays out the page even for identical text, so skip it when nothing changed. */
+    private static void setIfChanged(TextView v, String text) {
+        if (!text.contentEquals(v.getText())) v.setText(text);
+    }
+
     private void updateDriveStats() {
         DriveLog log = DriveLog.get(this);
         java.util.Calendar now = java.util.Calendar.getInstance();
@@ -609,10 +652,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         double topDay = today == null ? 0 : today.topKmh;
         double topMonth = log.monthTop(now.get(java.util.Calendar.YEAR), now.get(java.util.Calendar.MONTH));
         double kmDay = today == null ? 0 : today.km;
-        sTopDay.setText(topDay > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topDay), prefs.speedUnit()) : "--");
-        sTopMonth.setText(topMonth > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topMonth), prefs.speedUnit()) : "--");
-        sKmDay.setText(String.format(java.util.Locale.getDefault(), "%.1f %s", prefs.dist(kmDay), prefs.distUnit()));
-        sKmDayLabel.setText("Driven today");
+        setIfChanged(sTopDay, topDay > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topDay), prefs.speedUnit()) : "--");
+        setIfChanged(sTopMonth, topMonth > 0 ? String.format(java.util.Locale.getDefault(), "%.0f %s", prefs.speed(topMonth), prefs.speedUnit()) : "--");
+        setIfChanged(sKmDay, String.format(java.util.Locale.getDefault(), "%.1f %s", prefs.dist(kmDay), prefs.distUnit()));
+        setIfChanged(sKmDayLabel, "Driven today");
     }
 
     /** Outlines the Android Auto tile in teal while a phone is connected. */

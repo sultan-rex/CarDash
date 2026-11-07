@@ -16,4 +16,14 @@
         <item>c</item>
         <item>f</item>
     </string-array>
+    <string-array name="theme_modes">
+        <item>Automatic (night 7 pm to 6 am)</item>
+        <item>Day</item>
+        <item>Night</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>auto</item>
+        <item>day</item>
+        <item>night</item>
+    </string-array>
 </resources>

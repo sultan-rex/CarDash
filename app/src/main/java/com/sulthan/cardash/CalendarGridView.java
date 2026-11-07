@@ -132,7 +132,7 @@ public class CalendarGridView extends View {
                 ring.setColor(accent);
                 c.drawRoundRect(cell, r, r, ring);
             } else if (thisMonth && d == today.get(Calendar.DAY_OF_MONTH)) {
-                ring.setColor(0x66FFFFFF);
+                ring.setColor((textColor & 0x00FFFFFF) | 0x66000000);
                 c.drawRoundRect(cell, r, r, ring);
             }
             text.setColor(drove ? textColor : dimColor);

@@ -56,6 +56,15 @@
                     android:layout_weight="1" />
 
                 <ImageButton
+                    android:id="@+id/btn_theme"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Day or night theme"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_moon" />
+
+                <ImageButton
                     android:id="@+id/btn_location"
                     style="@style/IconButton"
                     android:layout_width="48dp"
@@ -678,7 +687,8 @@
             android:id="@+id/dot_0"
             android:layout_width="6dp"
             android:layout_height="6dp"
-            android:src="@drawable/dot" />
+            android:src="@drawable/dot"
+            android:tint="@color/text" />
 
         <ImageView
             android:id="@+id/dot_1"
@@ -686,7 +696,8 @@
             android:layout_height="6dp"
             android:layout_marginStart="8dp"
             android:alpha="0.3"
-            android:src="@drawable/dot" />
+            android:src="@drawable/dot"
+            android:tint="@color/text" />
 
         <ImageView
             android:id="@+id/dot_2"
@@ -694,7 +705,8 @@
             android:layout_height="6dp"
             android:layout_marginStart="8dp"
             android:alpha="0.3"
-            android:src="@drawable/dot" />
+            android:src="@drawable/dot"
+            android:tint="@color/text" />
 
     </LinearLayout>
 </FrameLayout>

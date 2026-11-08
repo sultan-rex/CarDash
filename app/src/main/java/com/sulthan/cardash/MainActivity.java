@@ -351,7 +351,11 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         if (prefs.fahrenheit()) gCoolant.setRange(100, 266, 221, "°F");
         else gCoolant.setRange(40, 130, 105, "°C");
         fuel.refresh();
-        setIfChanged(sService, ServiceUi.summary(this));
+        // The round Service button reads "Service", or the job's name in amber when one is due or close.
+        String svc = ServiceUi.summary(this);
+        boolean urgent = svc.endsWith(" due") || svc.endsWith(" soon");
+        setIfChanged(sService, urgent ? svc : "Service");
+        sService.setTextColor(urgent ? ArcStyle.AMBER : GaugeView.color(this, R.color.text_dim));
         ServiceUi.remindIfDue(this);
         connect.start();
         ui.post(aaPoll);

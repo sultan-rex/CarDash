@@ -11,7 +11,10 @@ import android.view.View;
 
 import java.util.Locale;
 
-/** A thin 240° arc gauge with a smoothly animated arc and a large light digital readout. */
+/**
+ * A 240° gauge in the Horizon style: a thick arc that fills teal, turning amber as it nears the
+ * warning value and red past it, with a glowing tip and a large thin readout.
+ */
 public class GaugeView extends View {
     private static final float START = 150f;
     private static final float SWEEP = 240f;
@@ -25,12 +28,11 @@ public class GaugeView extends View {
     private float target = Float.NaN;
     private float shown = Float.NaN;
 
-    private final Paint track = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint arc = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint valueText = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint labelText = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF oval = new RectF();
-    private final int accent, warnColor, dim;
+    private final ArcStyle style;
+    private final int dim;
 
     public GaugeView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
@@ -44,20 +46,15 @@ public class GaugeView extends View {
         majorTicks = a.getInt(R.styleable.GaugeView_majorTicks, majorTicks);
         a.recycle();
 
-        accent = color(ctx, R.color.accent);
-        warnColor = color(ctx, R.color.warn);
         dim = color(ctx, R.color.text_dim);
+        style = new ArcStyle(ctx);
 
-        track.setStyle(Paint.Style.STROKE);
-        track.setStrokeCap(Paint.Cap.ROUND);
-        track.setColor(color(ctx, R.color.track));
-        arc.setStyle(Paint.Style.STROKE);
-        arc.setStrokeCap(Paint.Cap.ROUND);
         valueText.setColor(color(ctx, R.color.text));
         valueText.setTextAlign(Paint.Align.CENTER);
-        valueText.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        valueText.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
         labelText.setColor(dim);
         labelText.setTextAlign(Paint.Align.CENTER);
+        labelText.setLetterSpacing(0.1f);
     }
 
     private static String str(String s) { return s == null ? "" : s; }
@@ -85,15 +82,11 @@ public class GaugeView extends View {
         float w = getWidth(), h = getHeight();
         // The arc's open bottom ends at 0.5r below centre; the title sits just under that.
         float size = Math.min(w - 16, (h - 16) / 0.85f);
-        float stroke = size * 0.03f;
+        float stroke = size * 0.065f;
         float r = size / 2 - stroke;
         float contentH = stroke / 2 + r * 1.5f + size * 0.15f;
         float cx = w / 2, cy = (h - contentH) / 2 + stroke / 2 + r;
         oval.set(cx - r, cy - r, cx + r, cy + r);
-
-        track.setStrokeWidth(stroke);
-        arc.setStrokeWidth(stroke);
-        c.drawArc(oval, START, SWEEP, false, track);
 
         // Ease toward the target value for smooth motion between OBD samples.
         if (!Float.isNaN(target) && !Float.isNaN(shown) && Math.abs(target - shown) > (max - min) * 0.002f) {
@@ -103,20 +96,20 @@ public class GaugeView extends View {
             shown = target;
         }
 
-        String text = "--";
-        if (!Float.isNaN(shown)) {
-            float frac = Math.max(0, Math.min(1, (shown - min) / (max - min)));
-            boolean alarm = !Float.isNaN(warn) && shown >= warn;
-            arc.setColor(alarm ? warnColor : accent);
-            if (frac > 0.001f) c.drawArc(oval, START, SWEEP * frac, false, arc);
-            text = String.format(Locale.US, "%." + decimals + "f", shown);
-        }
+        // Amber from a little before the warning value, red at it; no warning value stays teal.
+        float redAt = Float.isNaN(warn) ? Float.NaN : (warn - min) / (max - min);
+        float amberAt = Float.isNaN(redAt) ? Float.NaN : redAt - 0.12f;
+        float frac = Float.isNaN(shown) ? Float.NaN : Math.max(0, Math.min(1, (shown - min) / (max - min)));
+        style.setStroke(stroke);
+        style.colours(cx, cy, START, SWEEP, amberAt, redAt);
+        style.draw(c, oval, START, SWEEP, frac, amberAt, redAt);
+        String text = Float.isNaN(shown) ? "--" : String.format(Locale.US, "%." + decimals + "f", shown);
 
         valueText.setTextSize(size * 0.24f);
         c.drawText(text, cx, cy + size * 0.07f, valueText);
         labelText.setTextSize(size * 0.08f);
         c.drawText(unit, cx, cy + size * 0.2f, labelText);
-        labelText.setTextSize(size * 0.095f);
-        c.drawText(title, cx, cy + r * 0.5f + size * 0.12f, labelText);
+        labelText.setTextSize(size * 0.085f);
+        c.drawText(title.toUpperCase(Locale.US), cx, cy + r * 0.5f + size * 0.12f, labelText);
     }
 }

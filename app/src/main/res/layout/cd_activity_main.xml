@@ -404,7 +404,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingBottom="28dp"
+            android:paddingBottom="18dp"
             android:paddingEnd="@dimen/edge_safe"
             android:paddingStart="@dimen/edge_safe"
             android:paddingTop="20dp">
@@ -508,88 +508,117 @@
 
                     <LinearLayout
                         android:id="@+id/btn_dtc"
-                        style="@style/Tile"
-                        android:layout_marginBottom="24dp"
-                        android:layout_marginTop="24dp">
+                        style="@style/RoundButton">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_warning_red" />
+                            style="@style/RoundButtonIcon"
+                            android:src="@drawable/ic_warning"
+                            android:tint="@color/warn" />
 
-                        <TextView style="@style/TileLabel" android:text="Fault codes" />
+                        <TextView style="@style/RoundButtonLabel" android:text="Fault codes" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="6dp"
-                android:layout_marginTop="2dp"
-                android:background="@color/line" />
-
+            <!-- Today's figures in one card, then round buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
+                android:layout_height="84dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <LinearLayout style="@style/StatBox">
-                    <TextView android:id="@+id/s_top_day" style="@style/FuelValue" />
-                    <TextView style="@style/StatLabel" android:text="Top today" />
-                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="68dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/pill_bg"
+                    android:divider="@drawable/divider_v"
+                    android:orientation="horizontal"
+                    android:showDividers="middle">
 
-                <LinearLayout style="@style/StatBox">
-                    <TextView android:id="@+id/s_top_month" style="@style/FuelValue" />
-                    <TextView style="@style/StatLabel" android:text="Top this month" />
-                </LinearLayout>
+                    <LinearLayout style="@style/StatBox">
+                        <TextView android:id="@+id/s_top_day" style="@style/FuelValue" android:textSize="22sp" />
+                        <TextView style="@style/StatLabel" android:text="Top today" />
+                    </LinearLayout>
 
-                <LinearLayout style="@style/StatBox">
-                    <TextView android:id="@+id/s_km_day" style="@style/FuelValue" />
-                    <TextView android:id="@+id/s_km_day_label" style="@style/StatLabel" android:text="Driven today" />
+                    <LinearLayout style="@style/StatBox">
+                        <TextView android:id="@+id/s_top_month" style="@style/FuelValue" android:textSize="22sp" />
+                        <TextView style="@style/StatLabel" android:text="Top this month" />
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/StatBox">
+                        <TextView android:id="@+id/s_km_day" style="@style/FuelValue" android:textSize="22sp" />
+                        <TextView android:id="@+id/s_km_day_label" style="@style/StatLabel" android:text="Driven today" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btn_service"
-                    style="@style/StatBox"
-                    android:background="@drawable/tile_bg"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        style="@style/FuelValue"
-                        android:text="Service  ›"
-                        android:textColor="@color/accent" />
-                    <TextView android:id="@+id/s_service" style="@style/StatLabel" android:text="" />
-                </LinearLayout>
+                    style="@style/RoundButton"
+                    android:layout_width="96dp"
+                    android:layout_weight="0">
 
+                    <ImageView
+                        style="@style/RoundButtonIcon"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_wrench" />
+
+                    <TextView
+                        android:id="@+id/s_service"
+                        style="@style/RoundButtonLabel"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Service"
+                        android:textSize="12sp" />
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/btn_hud"
-                    style="@style/StatBox"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/tile_bg"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <TextView
-                        style="@style/FuelValue"
-                        android:text="HUD  ›"
-                        android:textColor="@color/accent" />
-                    <TextView style="@style/StatLabel" android:text="Windshield" />
-                </LinearLayout>
+                    style="@style/RoundButton"
+                    android:layout_width="96dp"
+                    android:layout_weight="0">
 
+                    <ImageView
+                        style="@style/RoundButtonIcon"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_hud" />
+
+                    <TextView
+                        style="@style/RoundButtonLabel"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="HUD"
+                        android:textSize="12sp" />
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/btn_drives"
-                    android:layout_marginStart="6dp"
-                    style="@style/StatBox"
-                    android:background="@drawable/tile_bg"
-                    android:clickable="true"
-                    android:focusable="true">
+                    style="@style/RoundButton"
+                    android:layout_width="96dp"
+                    android:layout_weight="0">
+
+                    <ImageView
+                        style="@style/RoundButtonIcon"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_calendar" />
+
                     <TextView
-                        style="@style/FuelValue"
-                        android:text="Drives  ›"
-                        android:textColor="@color/accent" />
-                    <TextView style="@style/StatLabel" android:text="Calendar" />
+                        style="@style/RoundButtonLabel"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Drives"
+                        android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

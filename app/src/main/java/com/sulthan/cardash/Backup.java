@@ -113,7 +113,9 @@ final class Backup {
 
     /** Short-lived state that must not travel to another day or tablet. */
     private static boolean transientKey(String k) {
-        return k.startsWith("saver_") || k.equals("crash_times") || k.equals("service_reminded_day");
+        // Not "saver_minutes": that is the user's battery saver setting and must travel.
+        return k.equals("saver_active") || k.equals("saver_wifi_was_on") || k.equals("saver_bt_was_on")
+                || k.equals("crash_times") || k.equals("service_reminded_day");
     }
 
     /** Writes drives.csv and fuel.csv; returns the folder. */

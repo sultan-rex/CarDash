@@ -37,8 +37,14 @@ public class BatterySaver extends BroadcastReceiver {
         AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
         long at = SystemClock.elapsedRealtime() + min * 60_000L;
-        if (Build.VERSION.SDK_INT >= 19) am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(ctx));
-        else am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(ctx));
+        // Android 12+ allows exact alarms only with a special permission; a slightly late check is fine there.
+        boolean exact = Build.VERSION.SDK_INT >= 19 && (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms());
+        try {
+            if (exact) am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(ctx));
+            else am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(ctx));
+        } catch (SecurityException e) {
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(ctx));
+        }
     }
 
     /** Charging started: cancel the countdown and undo whatever the saver turned off. */

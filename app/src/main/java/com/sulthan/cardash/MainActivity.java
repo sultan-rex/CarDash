@@ -69,6 +69,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
     private FuelPage fuel;
     private ConnectControls connect;
     private SpeedoView speedo;
+    private HorizonView horizon;
     private GaugeView gRpm, gCoolant, gThrottle, gLoad, gVolt;
 
     private double gpsSpeedKmh = Double.NaN;
@@ -119,13 +120,17 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         setupSliders();
         aaTile = findViewById(R.id.tile_aa);
         aaIcon = findViewById(R.id.tile_aa_icon);
-        aaStatus = findViewById(R.id.tile_aa_status);
+        aaStatus = null; // the round Android Auto button shows the connection with a teal ring instead
         aaTile.setOnClickListener(v -> openAndroidAuto());
         pager = findViewById(R.id.pager);
         dots = new View[]{findViewById(R.id.dot_0), findViewById(R.id.dot_1), findViewById(R.id.dot_2)};
         pager.setOnPageChange(this::showPageBar);
         showPageBar(0);
         speedo = findViewById(R.id.g_speedo);
+        horizon = findViewById(R.id.horizon);
+        findViewById(R.id.btn_home_fuel).setOnClickListener(v -> pager.goTo(2));
+        findViewById(R.id.btn_home_drives).setOnClickListener(v -> startActivity(new Intent(this, DrivesActivity.class)));
+        findViewById(R.id.btn_home_hud).setOnClickListener(v -> startActivity(new Intent(this, HudActivity.class)));
         gRpm = findViewById(R.id.g_rpm);
         gCoolant = findViewById(R.id.g_coolant);
         gThrottle = findViewById(R.id.g_throttle);
@@ -341,8 +346,8 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         startGps();
         connectMedia();
         statSpeedLabel.setText(prefs.speedUnit());
-        if (prefs.mph()) speedo.setRange(160, 20, "mph");
-        else speedo.setRange(240, 20, "km/h");
+        if (prefs.mph()) { speedo.setRange(160, 20, "mph"); horizon.setRange(100, 20); }
+        else { speedo.setRange(240, 20, "km/h"); horizon.setRange(160, 40); }
         if (prefs.fahrenheit()) gCoolant.setRange(100, 266, 221, "°F");
         else gCoolant.setRange(40, 130, 105, "°C");
         fuel.refresh();
@@ -441,6 +446,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         double shownSpeed = Double.isNaN(speed) ? speed : prefs.speed(speed);
         statSpeed.setText(fmt(shownSpeed, 0));
         speedo.setValue(shownSpeed);
+        horizon.setValue(shownSpeed);
         // The engine readings show "--" until the OBD-II adapter is connected.
         ObdData d = obdConnected ? lastObd : new ObdData();
         gRpm.setValue(d.rpm);
@@ -623,7 +629,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
             npArt.setPadding(0, 0, 0, 0); // album art fills the square
             npArt.setImageBitmap(art);
         } else {
-            int pad = Math.round(28 * getResources().getDisplayMetrics().density);
+            int pad = Math.round(10 * getResources().getDisplayMetrics().density);
             npArt.setPadding(pad, pad, pad, pad); // a small note in the middle of the square
             npArt.setImageResource(R.drawable.ic_music);
             npArt.setImageTintList(ColorStateList.valueOf(GaugeView.color(this, R.color.text_dim)));
@@ -703,10 +709,10 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         boolean on = com.andrerinas.openheadunit.host.HostBridge.isConnected(this);
         if (aaShown != null && aaShown == on) return;
         aaShown = on;
-        aaTile.setBackgroundResource(on ? R.drawable.tile_bg_active : R.drawable.tile_bg);
+        aaIcon.setBackgroundResource(on ? R.drawable.circle_bg_active : R.drawable.circle_bg);
         aaIcon.setImageTintList(android.content.res.ColorStateList.valueOf(
                 GaugeView.color(this, on ? R.color.accent : R.color.text)));
-        aaStatus.setVisibility(on ? View.VISIBLE : View.GONE);
+        if (aaStatus != null) aaStatus.setVisibility(on ? View.VISIBLE : View.GONE);
     }
 
     private void openAndroidAuto() {

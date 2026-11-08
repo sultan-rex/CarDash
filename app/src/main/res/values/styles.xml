@@ -78,4 +78,50 @@
         <item name="android:tint">@color/text</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
+
+    <!-- Horizon home: round launch buttons -->
+    <style name="RoundButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">@drawable/round_ripple</item>
+    </style>
+
+    <style name="RoundButtonIcon">
+        <item name="android:layout_width">68dp</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:padding">20dp</item>
+        <item name="android:background">@drawable/circle_bg</item>
+        <item name="android:tint">@color/text</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="RoundButtonLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="MiniStat">
+        <item name="android:layout_width">110dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="MiniStatValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">--</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
 </resources>

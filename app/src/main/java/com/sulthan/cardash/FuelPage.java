@@ -30,6 +30,7 @@ final class FuelPage {
     private final FuelLog log;
     private final TextView avg, avgUnit, last, best, costPerKm, month, total, range, empty;
     private final ListView list;
+    private final HorizonView arc;
 
     FuelPage(Activity act, Prefs prefs) {
         this.act = act;
@@ -45,6 +46,8 @@ final class FuelPage {
         range = act.findViewById(R.id.fuel_range);
         empty = act.findViewById(R.id.fuel_empty);
         list = act.findViewById(R.id.fuel_list);
+        arc = act.findViewById(R.id.fuel_arc);
+        arc.setSweep(240); // a round gauge suits the narrow column better than the wide horizon
         list.setEmptyView(empty);
         act.findViewById(R.id.btn_fuel_add).setOnClickListener(v -> showAddDialog(null));
         list.setOnItemClickListener((p, v, pos, id) -> rowMenu((FuelLog.Entry) p.getItemAtPosition(pos)));
@@ -86,6 +89,10 @@ final class FuelPage {
     void refresh() {
         FuelLog.Stats s = log.stats();
         avg.setText(consumption(s.avgL100));
+        // The arc shows litres per 100 km (more fuel = further round, toward amber and red). In mpg,
+        // where bigger is better, it stays empty rather than read backwards.
+        arc.setRange(20, 5);
+        arc.setValue(imperial() ? Double.NaN : s.avgL100);
         avgUnit.setText(consumptionUnit() + " average");
         last.setText(consumption(s.lastL100));
         best.setText(consumption(s.bestL100));
@@ -110,7 +117,10 @@ final class FuelPage {
             FuelLog.Entry e = getItem(position);
             ((TextView) v.findViewById(R.id.row_date)).setText(date.format(new Date(e.time)));
             ((TextView) v.findViewById(R.id.row_odo)).setText(String.format(Locale.getDefault(),
-                    "%.0f %s%s", dist(e.odoKm), distUnit(), e.full ? "" : " · partial"));
+                    "%,.0f %s", dist(e.odoKm), distUnit()));
+            TextView full = v.findViewById(R.id.row_full);
+            full.setText(e.full ? "Full" : "Partial");
+            full.setTextColor(GaugeView.color(act, e.full ? R.color.accent : R.color.text_dim));
             ((TextView) v.findViewById(R.id.row_fuel)).setText(String.format(Locale.getDefault(),
                     "%.1f %s", vol(e.litres), volUnit()));
             ((TextView) v.findViewById(R.id.row_cost)).setText(money(e.cost));

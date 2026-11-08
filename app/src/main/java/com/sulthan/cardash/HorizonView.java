@@ -21,9 +21,9 @@ import java.util.Locale;
  * the new speed over a few frames only when the speed changes.
  */
 public class HorizonView extends View {
-    /** The arc spans this many degrees, centred on straight up. */
-    private static final float SWEEP = 140f;
-    private static final float START = 270f - SWEEP / 2f;
+    /** The arc spans this many degrees, centred on straight up (140 = the home screen's horizon). */
+    private float SWEEP = 140f;
+    private float START = 270f - SWEEP / 2f;
 
     private float max = 160, step = 40;
     private float target = Float.NaN, shown = 0;
@@ -64,6 +64,14 @@ public class HorizonView extends View {
         invalidate();
     }
 
+    /** A wider arc (up to about 270 degrees) makes a round gauge for narrow places. */
+    public void setSweep(float degrees) {
+        SWEEP = degrees;
+        START = 270f - degrees / 2f;
+        if (getWidth() > 0) onSizeChanged(getWidth(), getHeight(), getWidth(), getHeight());
+        invalidate();
+    }
+
     /** Speed in the displayed unit; NaN empties the arc. */
     public void setValue(double v) {
         float t = Double.isNaN(v) ? Float.NaN : (float) Math.max(0, Math.min(v, max));
@@ -78,7 +86,8 @@ public class HorizonView extends View {
         stroke = 14 * d;
         // A circle much wider than the view, so only its gentle top shows: the horizon.
         float half = SWEEP / 2f * (float) Math.PI / 180f;
-        r = (w / 2f - stroke - 8 * d) / (float) Math.sin(half);
+        // Over 180 degrees the widest point is the full circle, not the arc's ends.
+        r = (w / 2f - stroke - 8 * d) / (half > Math.PI / 2 ? 1f : (float) Math.sin(half));
         cx = w / 2f;
         cy = stroke + 10 * d + r;
         // The arc's lowest ends sit at cy - r*cos(half); keep them inside the view.
@@ -94,9 +103,16 @@ public class HorizonView extends View {
         num.setTextSize(13 * d);
 
         // Colour along the arc: teal for the first half, amber by ~80 %, red at the end.
-        fill.setShader(new SweepGradient(cx, cy,
-                new int[]{red, accent, accent, amber, red},
-                new float[]{0f, START / 360f, (START + SWEEP * 0.55f) / 360f, (START + SWEEP * 0.8f) / 360f, 1f}));
+        // Built from 0 and rotated to the arc's start (a little early, so the round start cap is teal),
+        // which also works for wide arcs that cross 3 o'clock.
+        float lead = 12f, k = SWEEP / 360f, o = lead / 360f;
+        SweepGradient g = new SweepGradient(cx, cy,
+                new int[]{accent, accent, amber, red, red},
+                new float[]{0f, o + k * 0.55f, o + k * 0.8f, o + k, 1f});
+        android.graphics.Matrix m = new android.graphics.Matrix();
+        m.setRotate(START - lead, cx, cy);
+        g.setLocalMatrix(m);
+        fill.setShader(g);
     }
 
     @Override

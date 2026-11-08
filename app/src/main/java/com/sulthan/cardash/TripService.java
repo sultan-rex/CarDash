@@ -34,6 +34,7 @@ public class TripService extends Service implements LocationListener {
     private LocationManager lm;
     private long lastTick;
     private double gpsKmh = Double.NaN;
+    private final GpsSpeedFilter gpsFilter = new GpsSpeedFilter();
     private long gpsAt;
 
     private final Runnable tick = new Runnable() {
@@ -112,11 +113,13 @@ public class TripService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location l) {
         boolean good = l.hasSpeed() && (!l.hasAccuracy() || l.getAccuracy() <= GPS_MAX_ACCURACY_M);
-        gpsKmh = good ? l.getSpeed() * 3.6 : Double.NaN;
-        gpsAt = SystemClock.elapsedRealtime();
+        long now = SystemClock.elapsedRealtime();
+        // Accurate enough, and no impossible jump from the reading before (indoor GPS spikes).
+        gpsKmh = gpsFilter.accept(good ? l.getSpeed() * 3.6 : Double.NaN, now);
+        gpsAt = now;
     }
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
     @Override public void onProviderEnabled(String provider) { }
-    @Override public void onProviderDisabled(String provider) { gpsKmh = Double.NaN; }
+    @Override public void onProviderDisabled(String provider) { gpsKmh = Double.NaN; gpsFilter.reset(); }
 }

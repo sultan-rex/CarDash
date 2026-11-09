@@ -31,6 +31,8 @@ final class FuelPage {
     private final TextView avg, avgUnit, last, best, costPerKm, month, total, range, empty;
     private final ListView list;
     private final HorizonView arc;
+    /** Called after the log changes, so other screens (the home mileage) can update. */
+    Runnable onChange;
 
     FuelPage(Activity act, Prefs prefs) {
         this.act = act;
@@ -103,6 +105,18 @@ final class FuelPage {
         range.setText(Double.isNaN(s.avgKmPerFill) ? "--"
                 : String.format(Locale.getDefault(), "%.0f %s", dist(s.avgKmPerFill), distUnit()));
         list.setAdapter(new Rows(log.entries()));
+        if (onChange != null) onChange.run();
+    }
+
+    /**
+     * Average fuel mileage for the home screen: km per litre (miles per gallon in imperial), from the
+     * full-tank fill-ups. "--" until there are two full fills to measure between.
+     */
+    String mileage() {
+        double l100 = log.stats().avgL100;
+        if (Double.isNaN(l100) || l100 <= 0) return imperial() ? "-- mpg avg" : "-- km/L avg";
+        return imperial() ? String.format(Locale.getDefault(), "%.1f mpg avg", 235.215 / l100)
+                : String.format(Locale.getDefault(), "%.1f km/L avg", 100.0 / l100);
     }
 
     private final class Rows extends ArrayAdapter<FuelLog.Entry> {

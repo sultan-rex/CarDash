@@ -178,6 +178,21 @@
                             android:id="@+id/stat_speed_label"
                             style="@style/StatLabel"
                             android:text="km/h" />
+
+                        <TextView
+                            android:id="@+id/home_mileage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/chip_bg"
+                            android:fontFamily="sans-serif"
+                            android:paddingBottom="3dp"
+                            android:paddingEnd="12dp"
+                            android:paddingStart="12dp"
+                            android:paddingTop="3dp"
+                            android:text="-- km/L avg"
+                            android:textColor="@color/accent"
+                            android:textSize="15sp" />
                     </LinearLayout>
 
                     <LinearLayout

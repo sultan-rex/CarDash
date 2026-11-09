@@ -144,6 +144,7 @@ public class MainActivity extends Activity implements ObdManager.Listener {
         homeMileage.setOnClickListener(v -> pager.goTo(2)); // tap: the fill-up page
         fuel.onChange = () -> setIfChanged(homeMileage, fuel.mileage());
         connect = new ConnectControls(this);
+        findViewById(R.id.btn_screen_off).setOnClickListener(v -> ScreenOff.press(this));
         findViewById(R.id.btn_settings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
         findViewById(R.id.now_playing).setOnClickListener(v -> { if (!mediaAccess) openMediaAccessSettings(this); });
 

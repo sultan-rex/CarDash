@@ -105,10 +105,20 @@
                     style="@style/IconButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="0dp"
                     android:contentDescription="Bluetooth"
                     android:padding="12dp"
                     android:src="@drawable/ic_bluetooth" />
+
+                <ImageButton
+                    android:id="@+id/btn_screen_off"
+                    style="@style/IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="Screen off"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_power" />
 
                 <ImageView
                     android:id="@+id/obd_dot"

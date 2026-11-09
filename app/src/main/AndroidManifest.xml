@@ -107,6 +107,20 @@
             </intent-filter>
         </service>
 
+        <!-- Device admin, used only to switch the screen off from the on-screen power button. -->
+        <receiver
+            android:name=".ScreenOff$Admin"
+            android:exported="true"
+            android:label="CarDash screen off"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".BatterySaver"
             android:exported="false" />

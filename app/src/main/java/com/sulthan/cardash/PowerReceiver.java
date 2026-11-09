@@ -31,6 +31,7 @@ public class PowerReceiver extends BroadcastReceiver {
             return;
         }
         BatterySaver.wake(ctx);
+        ScreenOff.wake(ctx); // a blacked-out screen comes back when the car starts
         if (!new Prefs(ctx).launchOnPower()) return;
 
         // Light the screen first, then hold it for a few seconds while the activity comes up.
